@@ -1,0 +1,120 @@
+/* src/styles/theme.css - BerryBasket Organic Agricultural Design System */
+
+:root {
+  /* Main Backgrounds & Surfaces */
+  --bg-body: #FAF6F0;
+  --bg-main: #FAF6F0;
+  --bg-card: #FFFFFF;
+  --bg-card-muted: #F5EFE6;
+  --bg-sage-subtle: #F0F5EE;
+  --bg-glass: rgba(250, 246, 240, 0.94);
+
+  /* Sidebar Palette - Warm Cream & Organic Accents */
+  --bg-sidebar: #FFFFFF;
+  --bg-sidebar-darker: #F5EFE6;
+  --bg-sidebar-hover: #F2EBE1;
+  --bg-sidebar-active: #FDF2F4;
+  --sidebar-text: #4A3E39;
+  --sidebar-text-muted: #8A7B74;
+  --sidebar-active-text: #355E3B;
+  --sidebar-accent: #355E3B;
+
+  /* Primary Brand - Deep Botanical Forest Green */
+  --primary: #355E3B;
+  --primary-dark: #27472D;
+  --primary-light: #4B7852;
+  --primary-subtle: #EBF2EA;
+  --primary-border: #D0E0CF;
+
+  /* Green Accent Variables */
+  --maroon-primary: #355E3B;
+  --maroon-dark: #27472D;
+  --maroon-light: #4B7852;
+  --maroon-subtle: #EBF2EA;
+  --maroon-border: #D0E0CF;
+
+  /* Warm Accent & Rating Colors */
+  --coral-primary: #355E3B;
+  --coral-light: #4B7852;
+  --coral-subtle: #EBF2EA;
+  --amber-primary: #EAA024;
+  --amber-light: #F5B038;
+  --amber-subtle: #FEF7EC;
+  --amber-border: #FBE5C3;
+
+  /* Status Colors */
+  --success: #355E3B;
+  --success-bg: #EBF2EA;
+  --success-border: #D0E0CF;
+  --danger: #C0392B;
+  --danger-bg: #FDF2F2;
+  --danger-border: #FADBD8;
+  --info: #2980B9;
+  --info-bg: #EBF5FB;
+
+  /* Neutrals & Organic Typography */
+  --text-main: #2C1E1A;
+  --text-body: #4A3E39;
+  --text-muted: #786C66;
+  --text-light: #A39690;
+  --border-color: #EFE6DA;
+  --border-subtle: #F5EEE4;
+
+  /* Modern Soft Card Shadows */
+  --shadow-sm: 0 1px 3px rgba(44, 30, 26, 0.04), 0 1px 2px rgba(44, 30, 26, 0.02);
+  --shadow-md: 0 4px 14px rgba(44, 30, 26, 0.06), 0 1px 3px rgba(44, 30, 26, 0.03);
+  --shadow-lg: 0 14px 32px -4px rgba(112, 27, 46, 0.1), 0 4px 14px -2px rgba(44, 30, 26, 0.04);
+  --shadow-card: 0 4px 16px rgba(44, 30, 26, 0.04);
+  --shadow-card-hover: 0 12px 28px rgba(112, 27, 46, 0.09);
+
+  /* Border Radii */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-pill: 9999px;
+
+  /* Typography */
+  --font-serif: 'Playfair Display', 'DM Serif Display', Georgia, serif;
+  --font-sans: 'DM Sans', 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-family: var(--font-sans);
+}
+
+/* Global Reset & Base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, .font-serif, .section-title, .hero-title {
+  font-family: var(--font-serif);
+}
+
+/* Custom Smooth Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D8CCC4;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B0A298;
+}

@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+@import './styles/theme.css';
+@import "tailwindcss";
+
+@theme inline {
+  --color-fb-bg: #FAF6F0;
+  --color-fb-charcoal: #2C1E1A;
+  --color-fb-maroon: #701B2E;
+  --color-fb-maroon-dark: #561221;
+  --color-fb-maroon-subtle: #FDF2F4;
+  --color-fb-green: #355E3B;
+  --color-fb-green-light: #4B7852;
+  --color-fb-sage: #F0F5EE;
+  --color-fb-cream: #F5EFE6;
+  --color-fb-border: #EFE6DA;
+  --color-fb-gray: #786C66;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'DM Sans', 'Plus Jakarta Sans', sans-serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--bg-body, #FAF6F0);
+    color: var(--text-main, #2C1E1A);
+    font-family: var(--font-sans, 'DM Sans', sans-serif);
+  }
+
+  h1, h2, h3, h4, .serif-heading {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+}
+
+html, body, #root {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
