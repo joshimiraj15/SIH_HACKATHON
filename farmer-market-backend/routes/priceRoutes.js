@@ -1,7 +1,25 @@
 const express = require('express');
 const router = express.Router();
-const priceController = require('../controllers/priceController');
+const {
+    addMarketPrice,
+    getAllMarketPrices,
+    getPricesByCrop,
+    getLatestPriceByCrop,
+    searchPrices,
+    discoverPrice,
+    deleteMarketPrice
+} = require('../controllers/priceController');
+const { protect } = require('../middleware/authMiddleware');
+const { authorizeRoles } = require('../middleware/roleMiddleware');
 
-router.get('/', priceController.getPrices);
+router.route('/')
+    .get(getAllMarketPrices)
+    .post(protect, authorizeRoles('admin'), addMarketPrice);
+
+router.get('/search', searchPrices);
+router.get('/discover/:cropName', discoverPrice);
+router.get('/latest/:cropName', getLatestPriceByCrop);
+router.get('/crop/:cropName', getPricesByCrop);
+router.delete('/:id', protect, authorizeRoles('admin'), deleteMarketPrice);
 
 module.exports = router;
