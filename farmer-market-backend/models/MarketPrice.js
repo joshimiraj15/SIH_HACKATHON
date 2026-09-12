@@ -2,62 +2,30 @@ const mongoose = require('mongoose');
 
 const MarketPriceSchema = new mongoose.Schema(
     {
-        cropName: {
-            type: String,
-            required: [true, 'Crop name is required'],
-            trim: true,
-            lowercase: true
-        },
-        marketName: {
-            type: String,
-            required: [true, 'Market name is required'],
-            trim: true
-        },
-        state: {
-            type: String,
-            required: [true, 'State is required'],
-            trim: true
-        },
-        district: {
-            type: String,
-            required: [true, 'District is required'],
-            trim: true
-        },
-        date: {
-            type: Date,
-            required: [true, 'Date is required'],
-            default: Date.now
-        },
-        minPrice: {
-            type: Number,
-            required: [true, 'Minimum price is required'],
-            min: [0, 'Min price must be positive']
-        },
-        maxPrice: {
-            type: Number,
-            required: [true, 'Maximum price is required'],
-            min: [0, 'Max price must be positive']
-        },
-        modalPrice: {
-            type: Number,
-            required: [true, 'Modal price is required'],
-            min: [0, 'Modal price must be positive']
-        },
-        unit: {
-            type: String,
-            required: [true, 'Unit is required'],
-            default: 'Quintal'
-        }
+        date: { type: Date, required: true, default: Date.now },
+        commodity: { type: String, trim: true },
+        cropName: { type: String, trim: true },
+        state: { type: String, required: true, trim: true },
+        district: { type: String, required: true, trim: true },
+        market: { type: String, trim: true },
+        marketName: { type: String, trim: true },
+        variety: { type: String, default: 'Local' },
+        grade: { type: String, default: 'A' },
+        minPrice: { type: Number, required: true },
+        maxPrice: { type: Number, required: true },
+        modalPrice: { type: Number, required: true },
+        arrivalQuantity: { type: Number, default: 0 },
+        unit: { type: String, default: 'Quintal' }
     },
-    {
-        timestamps: true
-    }
+    { timestamps: true }
 );
 
+// Pre-save hook to ensure commodity/cropName and market/marketName sync
 MarketPriceSchema.pre('save', function (next) {
-    if (this.minPrice > this.modalPrice || this.modalPrice > this.maxPrice) {
-        return next(new Error('Validation Error: Prices must satisfy minPrice <= modalPrice <= maxPrice'));
-    }
+    if (!this.commodity && this.cropName) this.commodity = this.cropName;
+    if (!this.cropName && this.commodity) this.cropName = this.commodity;
+    if (!this.market && this.marketName) this.market = this.marketName;
+    if (!this.marketName && this.market) this.marketName = this.market;
     next();
 });
 

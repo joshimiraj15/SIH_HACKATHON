@@ -21,11 +21,13 @@ exports.registerUser = async (req, res, next) => {
             });
         }
 
-        const userExists = await User.findOne({ email });
+        const userExists = await User.findOne({
+            $or: [{ email }, { phone }]
+        });
         if (userExists) {
             return res.status(400).json({
                 success: false,
-                message: 'User already exists with this email address',
+                message: 'User already exists with this email or mobile number',
                 error: 'Duplicate Record'
             });
         }
@@ -64,12 +66,19 @@ exports.loginUser = async (req, res, next) => {
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
-                message: 'Please provide both email and password',
+                message: 'Please provide both email/mobile and password',
                 error: 'Bad Request'
             });
         }
 
-        const user = await User.findOne({ email }).select('+password');
+        const cleanLogin = email.trim();
+        const user = await User.findOne({
+            $or: [
+                { email: cleanLogin.toLowerCase() },
+                { phone: cleanLogin },
+                { email: `${cleanLogin}@kishansetu.in` }
+            ]
+        }).select('+password');
 
         if (user && (await user.matchPassword(password))) {
             res.status(200).json({
@@ -88,7 +97,7 @@ exports.loginUser = async (req, res, next) => {
         } else {
             res.status(401).json({
                 success: false,
-                message: 'Invalid email or password',
+                message: 'Invalid email/mobile or password',
                 error: 'Unauthorized'
             });
         }
