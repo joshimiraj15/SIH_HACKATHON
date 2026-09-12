@@ -1,3 +1,4 @@
+// src/components/auth/AuthPage.jsx
 import React, { useState } from 'react';
 import confetti from 'canvas-confetti';
 import { translations } from '../../data/translations';
@@ -14,6 +15,7 @@ const AuthPage = ({
   setLanguage
 }) => {
   const [authMode, setAuthMode] = useState(initialMode); // 'signin' or 'signup'
+  const [selectedRole, setSelectedRole] = useState('farmer'); // 'farmer' or 'buyer'
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -22,6 +24,8 @@ const AuthPage = ({
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [district, setDistrict] = useState('Rajkot');
+  const [companyName, setCompanyName] = useState('');
+  const [businessType, setBusinessType] = useState('Wholesale Trader');
 
   const t = translations[language] || translations.en;
 
@@ -30,7 +34,7 @@ const AuthPage = ({
     setError(null);
     setLoading(true);
 
-    const inputVal = email.trim() || 'farmer@kishansetu.in';
+    const inputVal = email.trim() || (selectedRole === 'buyer' ? 'buyer@agrofresh.in' : 'farmer@kishansetu.in');
     const loginPass = password || 'farmer123';
 
     try {
@@ -41,7 +45,8 @@ const AuthPage = ({
         onLoginSuccess({
           ...farmerProfile,
           ...userData,
-          name: userData.name || farmerProfile.name,
+          role: userData.role || selectedRole,
+          name: userData.name || (selectedRole === 'buyer' ? 'AgroFresh Procurement' : farmerProfile.name),
           email: userData.email || inputVal,
           location: userData.location || `${district}, Gujarat`
         }, userData.token);
@@ -49,14 +54,15 @@ const AuthPage = ({
         // Backend offline fallback - smooth login
         onLoginSuccess({
           ...farmerProfile,
-          name: inputVal.split('@')[0] || farmerProfile.name,
+          role: selectedRole,
+          name: selectedRole === 'buyer' ? 'AgroFresh Procurement' : (inputVal.split('@')[0] || farmerProfile.name),
           email: inputVal.includes('@') ? inputVal : `${inputVal}@kishansetu.in`,
           phone: !inputVal.includes('@') ? inputVal : farmerProfile.phone,
           location: `${district}, Gujarat`
         }, 'mock-jwt-token-fallback');
       } else {
         if (inputVal.toLowerCase().includes('meet') || inputVal.includes('98765') || inputVal === '') {
-          onLoginSuccess(farmerProfile, 'mock-jwt-token-meet-1');
+          onLoginSuccess({ ...farmerProfile, role: selectedRole }, 'mock-jwt-token-meet-1');
         } else {
           setError(res.error || 'Invalid email/mobile or password.');
         }
@@ -65,6 +71,7 @@ const AuthPage = ({
       // Graceful offline fallback
       onLoginSuccess({
         ...farmerProfile,
+        role: selectedRole,
         email: inputVal.includes('@') ? inputVal : `${inputVal}@kishansetu.in`,
         location: `${district}, Gujarat`
       }, 'mock-jwt-token-fallback');
@@ -84,15 +91,20 @@ const AuthPage = ({
     const finalPhone = isDigitsOnly ? inputVal : '+91 98765 43210';
     const finalEmail = isDigitsOnly
       ? `${inputVal.replace(/[^0-9]/g, '')}@kishansetu.in`
-      : (inputVal.includes('@') ? inputVal : `${inputVal || 'farmer'}@kishansetu.in`);
+      : (inputVal.includes('@') ? inputVal : `${inputVal || 'user'}@kishansetu.in`);
+
+    const finalName = selectedRole === 'buyer'
+      ? (companyName.trim() || name.trim() || 'KisanSetu Buyer')
+      : (name.trim() || 'Kisan Partner');
 
     const newUserData = {
-      name: name.trim() || 'Kisan Partner',
+      name: finalName,
       email: finalEmail,
       phone: finalPhone,
       password: password || 'farmer123',
       location: `${district}, Gujarat`,
-      role: 'farmer'
+      role: selectedRole,
+      businessType: selectedRole === 'buyer' ? businessType : undefined
     };
 
     try {
@@ -100,28 +112,33 @@ const AuthPage = ({
 
       if (res.success && res.data) {
         try {
-          confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } });
-        } catch (e) {}
+          confetti({ particleCount: 75, spread: 75, origin: { y: 0.6 } });
+        } catch (e) { }
         const userData = res.data;
         onLoginSuccess({
           ...farmerProfile,
           ...userData,
+          role: selectedRole,
           name: userData.name || newUserData.name,
           email: userData.email || newUserData.email,
           phone: userData.phone || newUserData.phone,
           location: userData.location || newUserData.location,
-          avatar: farmerProfile.avatar
+          avatar: selectedRole === 'buyer'
+            ? 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80'
+            : farmerProfile.avatar
         }, userData.token);
       } else if (res.networkError) {
         // Backend offline fallback - smooth account creation
         try {
-          confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } });
-        } catch (e) {}
+          confetti({ particleCount: 75, spread: 75, origin: { y: 0.6 } });
+        } catch (e) { }
         onLoginSuccess({
           ...farmerProfile,
           ...newUserData,
           id: `KGP${Math.floor(100000 + Math.random() * 900000)}`,
-          avatar: farmerProfile.avatar
+          avatar: selectedRole === 'buyer'
+            ? 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80'
+            : farmerProfile.avatar
         }, 'mock-register-token');
       } else {
         setError(res.error || 'Registration failed.');
@@ -129,13 +146,15 @@ const AuthPage = ({
     } catch (err) {
       // Offline fallback
       try {
-        confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } });
-      } catch (e) {}
+        confetti({ particleCount: 75, spread: 75, origin: { y: 0.6 } });
+      } catch (e) { }
       onLoginSuccess({
         ...farmerProfile,
         ...newUserData,
         id: `KGP${Math.floor(100000 + Math.random() * 900000)}`,
-        avatar: farmerProfile.avatar
+        avatar: selectedRole === 'buyer'
+          ? 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80'
+          : farmerProfile.avatar
       }, 'mock-register-token');
     } finally {
       setLoading(false);
@@ -194,21 +213,42 @@ const AuthPage = ({
                   className={`po-lang-btn ${language === 'hi' ? 'active' : ''}`}
                   onClick={() => setLanguage('hi')}
                 >
-                  हिं
+                  हिં
                 </button>
               </div>
             )}
           </div>
 
+          {/* Role Selection Toggle */}
+          <div className="po-role-toggle-container">
+            <span className="po-role-label">Account Type:</span>
+            <div className="po-role-pill-group">
+              <button
+                type="button"
+                className={`po-role-pill ${selectedRole === 'farmer' ? 'active' : ''}`}
+                onClick={() => setSelectedRole('farmer')}
+              >
+                🌾 Farmer (Seller)
+              </button>
+              <button
+                type="button"
+                className={`po-role-pill ${selectedRole === 'buyer' ? 'active' : ''}`}
+                onClick={() => setSelectedRole('buyer')}
+              >
+                🏢 Buyer (Trader)
+              </button>
+            </div>
+          </div>
+
           {/* Heading */}
           <div className="po-heading-block">
             <div className="po-eyebrow">
-              {authMode === 'signin' ? 'Login to' : 'Sign up for'}
+              {authMode === 'signin' ? `Login as ${selectedRole === 'buyer' ? 'Buyer' : 'Farmer'}` : `Register as ${selectedRole === 'buyer' ? 'Verified Buyer' : 'Farmer Seller'}`}
             </div>
             <h1 className="po-serif-title">
               {authMode === 'signin'
-                ? 'Where Knowledge Comes Alive'
-                : 'Where Growth Takes Root'}
+                ? (selectedRole === 'buyer' ? 'Direct Farm Procurement' : 'Where Knowledge Comes Alive')
+                : (selectedRole === 'buyer' ? 'Connect with Local Farmers' : 'Where Growth Takes Root')}
             </h1>
           </div>
 
@@ -219,7 +259,7 @@ const AuthPage = ({
             <form onSubmit={handleSignIn} className="po-form">
               <input
                 type="text"
-                placeholder="Enter email or mobile"
+                placeholder={selectedRole === 'buyer' ? "Enter business email or mobile" : "Enter email or mobile"}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="po-input"
@@ -239,7 +279,7 @@ const AuthPage = ({
                 className="po-submit-btn"
                 disabled={loading}
               >
-                {loading ? 'Authenticating...' : 'Sign In →'}
+                {loading ? 'Authenticating...' : `Sign In as ${selectedRole === 'buyer' ? 'Buyer' : 'Farmer'} →`}
               </button>
 
               <div className="po-switch-row">
@@ -258,17 +298,41 @@ const AuthPage = ({
             </form>
           ) : (
             <form onSubmit={handleSignUp} className="po-form">
+              {selectedRole === 'buyer' ? (
+                <>
+                  <input
+                    type="text"
+                    placeholder="Enter company / business name"
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    className="po-input"
+                    required
+                  />
+                  <select
+                    value={businessType}
+                    onChange={(e) => setBusinessType(e.target.value)}
+                    className="po-input po-select"
+                  >
+                    <option value="Wholesale Trader">Wholesale Trader & APMC Merchant</option>
+                    <option value="Food Processing Industry">Food Processing & Manufacturing</option>
+                    <option value="Agricultural Exporter">Agricultural Exporter</option>
+                    <option value="Retail Supermarket Chain">Retail Supermarket Chain</option>
+                  </select>
+                </>
+              ) : (
+                <input
+                  type="text"
+                  placeholder="Enter full name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="po-input"
+                  required
+                />
+              )}
+
               <input
                 type="text"
-                placeholder="Enter full name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="po-input"
-                required
-              />
-              <input
-                type="text"
-                placeholder="Enter email or mobile"
+                placeholder={selectedRole === 'buyer' ? "Enter business email or mobile" : "Enter email or mobile"}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="po-input"
@@ -299,7 +363,7 @@ const AuthPage = ({
                 className="po-submit-btn"
                 disabled={loading}
               >
-                {loading ? 'Creating Account...' : 'Create Account →'}
+                {loading ? 'Creating Account...' : `Register as ${selectedRole === 'buyer' ? 'Buyer' : 'Farmer'} →`}
               </button>
 
               <div className="po-switch-row">

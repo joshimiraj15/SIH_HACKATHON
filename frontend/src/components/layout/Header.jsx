@@ -34,7 +34,7 @@ const liveTickerCrops = [
   { crop: 'Maize (Makka)', price: '₹2,180/qtl', change: '+0.8%', trend: 'up', mandi: 'Vadodara' }
 ];
 
-const Header = ({ activeTab, setActiveTab, language, setLanguage, user, onLogout }) => {
+const Header = ({ activeTab, setActiveTab, language, setLanguage, user, onLogout, activeRole = 'farmer', onToggleRole }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
@@ -86,15 +86,39 @@ const Header = ({ activeTab, setActiveTab, language, setLanguage, user, onLogout
   ];
 
   const currentLangObj = languagesList.find(l => l.code === language) || languagesList[0];
-  const firstName = (user?.name || 'Meet').split(' ')[0];
+  const firstName = (user?.name || (activeRole === 'buyer' ? 'AgroFresh' : 'Meet')).split(' ')[0];
 
   return (
     <header className="kisan-header-wrapper">
       <div className="kisan-top-header">
         {/* Left: Personalized Greeting */}
         <div className="header-greeting-block">
-          <h1 className="header-greeting-title">Hi, {firstName} 👋</h1>
-          <p className="header-greeting-sub">Live APMC Intelligence & Mandi Trading Hub</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <h1 className="header-greeting-title">Hi, {firstName} 👋</h1>
+            <button
+              type="button"
+              onClick={onToggleRole}
+              style={{
+                background: activeRole === 'buyer' ? '#1E293B' : '#166534',
+                color: '#FFFFFF',
+                border: 'none',
+                padding: '3px 10px',
+                borderRadius: '12px',
+                fontSize: '0.74rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+              title="Click to switch role"
+            >
+              {activeRole === 'buyer' ? '🏢 Buyer Portal' : '🌾 Farmer Portal'}
+            </button>
+          </div>
+          <p className="header-greeting-sub">
+            {activeRole === 'buyer' ? 'Direct Farm Produce Sourcing & Bulk Procurement' : 'Live APMC Intelligence & Mandi Trading Hub'}
+          </p>
         </div>
 
         {/* Center: Search Bar */}
@@ -103,7 +127,7 @@ const Header = ({ activeTab, setActiveTab, language, setLanguage, user, onLogout
             <Search size={16} className="search-icon" />
             <input 
               type="text" 
-              placeholder="Search mandi prices, crops, buyers, APMC..." 
+              placeholder={activeRole === 'buyer' ? "Search farmer crops, locations, commodities..." : "Search mandi prices, crops, buyers, APMC..."} 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="search-input"

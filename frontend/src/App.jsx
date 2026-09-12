@@ -10,13 +10,14 @@ import AuthPage from './components/auth/AuthPage';
 // AI Chatbot
 import AIChatbot from './components/chat/AIChatbot';
 
-// 8 Views
+// Views
 import LandingPage from './components/views/LandingPage';
 import HomeDashboard from './components/views/HomeDashboard';
 import MarketPrices from './components/MarketPrices';
 import PriceRadar from './components/views/PriceRadar';
 import WhereShouldISell from './components/views/WhereShouldISell';
 import BuyerMarketplace from './components/views/BuyerMarketplace';
+import BuyerDashboard from './components/views/BuyerDashboard';
 import MyCrops from './components/views/MyCrops';
 import PriceForecast from './components/views/PriceForecast';
 import PriceJourney from './components/views/PriceJourney';
@@ -27,12 +28,13 @@ import MessagesView from './components/views/MessagesView';
 // Modals
 import AddCropModal from './components/modals/AddCropModal';
 import BuyerOfferModal from './components/modals/BuyerOfferModal';
+import PlaceOrderModal from './components/modals/PlaceOrderModal';
 import EditProfileModal from './components/modals/EditProfileModal';
 
 // Mock Data & Translations
 import { myCropsData, farmerProfile } from './data/mockData';
 import { translations } from './data/translations';
-import { cropsAPI, authAPI, checkBackendHealth } from './services/api';
+import { cropsAPI, authAPI, offersAPI, checkBackendHealth } from './services/api';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
@@ -42,6 +44,17 @@ function App() {
   const [currentUser, setCurrentUser] = useState(() => {
     const saved = localStorage.getItem('kisansetu_user');
     return saved ? JSON.parse(saved) : farmerProfile;
+  });
+
+  const [activeRole, setActiveRole] = useState(() => {
+    const saved = localStorage.getItem('kisansetu_user');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.role?.toLowerCase() === 'buyer') return 'buyer';
+      } catch (e) {}
+    }
+    return 'farmer';
   });
 
   // Language State: 'en', 'gu', 'hi'
@@ -65,11 +78,41 @@ function App() {
     } catch (e) {}
     return myCropsData;
   });
+
+  const [buyerOffers, setBuyerOffers] = useState(() => {
+    try {
+      const saved = localStorage.getItem('kisansetu_offers');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) {}
+    return [
+      {
+        id: 'offer-1',
+        cropId: 'crop-1',
+        cropName: 'Wheat (Sharbati Gold)',
+        farmerName: 'Meet Maniya',
+        farmerLocation: 'Rajkot, Gujarat',
+        buyerName: 'AgroFresh Foods',
+        offeredPrice: 2520,
+        quantity: 100,
+        totalValue: 252000,
+        paymentTerm: 'Instant Digital Transfer (UPI/RTGS)',
+        logistics: 'Farm Gate Pickup (Buyer Arranged)',
+        notes: 'Interested in Grade A Sharbati wheat batch.',
+        status: 'pending',
+        timestamp: 'Today'
+      }
+    ];
+  });
+
   const [isBackendConnected, setIsBackendConnected] = useState(false);
 
   // Modal States
   const [isAddCropOpen, setIsAddCropOpen] = useState(false);
   const [selectedBuyerForOffer, setSelectedBuyerForOffer] = useState(null);
+  const [selectedCropForOrder, setSelectedCropForOrder] = useState(null);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
 
@@ -80,6 +123,18 @@ function App() {
     setTimeout(() => {
       setToastMessage(null);
     }, 4000);
+  };
+
+  const handleToggleRole = () => {
+    const nextRole = activeRole === 'farmer' ? 'buyer' : 'farmer';
+    setActiveRole(nextRole);
+    if (nextRole === 'buyer') {
+      setActiveTab('buyer-dashboard');
+      showToast('🏢 Switched to Buyer (Procurement) Mode!');
+    } else {
+      setActiveTab('home');
+      showToast('🌾 Switched to Farmer (Seller) Mode!');
+    }
   };
 
   // Sync with backend on mount
@@ -112,6 +167,11 @@ function App() {
           }));
           setCrops(mappedCrops);
         }
+
+        const offersRes = await offersAPI.getOffers();
+        if (offersRes.success && Array.isArray(offersRes.data) && offersRes.data.length > 0) {
+          setBuyerOffers(offersRes.data);
+        }
       }
     };
 
@@ -120,12 +180,18 @@ function App() {
 
   const handleLoginSuccess = (userData, token) => {
     const userToSet = { ...farmerProfile, ...userData };
+    const userRole = (userData.role || 'farmer').toLowerCase();
     setCurrentUser(userToSet);
+    setActiveRole(userRole);
     setIsLoggedIn(true);
-    setActiveTab('home');
+    if (userRole === 'buyer') {
+      setActiveTab('buyer-dashboard');
+    } else {
+      setActiveTab('home');
+    }
     localStorage.setItem('kisansetu_user', JSON.stringify(userToSet));
     if (token) localStorage.setItem('kisansetu_token', token);
-    showToast(`🌾 ${t.welcomeBack} (${userToSet.name})`);
+    showToast(`🌾 ${t.welcomeBack} (${userToSet.name}) as ${userRole === 'buyer' ? 'Buyer' : 'Farmer'}`);
   };
 
   const handleLogout = () => {
@@ -171,6 +237,52 @@ function App() {
     }
   };
 
+  const handlePlaceOffer = async (offerData) => {
+    const updatedOffers = [offerData, ...buyerOffers];
+    setBuyerOffers(updatedOffers);
+    try {
+      localStorage.setItem('kisansetu_offers', JSON.stringify(updatedOffers));
+    } catch (e) {}
+    showToast(`📦 Offer sent to ${offerData.farmerName} for ₹${offerData.totalValue.toLocaleString()}!`);
+
+    try {
+      await offersAPI.makeOffer({
+        cropId: offerData.cropId,
+        offeredPrice: offerData.offeredPrice,
+        quantity: offerData.quantity,
+        message: offerData.notes
+      });
+    } catch (err) {
+      console.warn('Could not save offer to backend, stored in local state.');
+    }
+  };
+
+  const handleAcceptOffer = async (offerId) => {
+    const updated = buyerOffers.map((o) => o.id === offerId ? { ...o, status: 'accepted' } : o);
+    setBuyerOffers(updated);
+    try {
+      localStorage.setItem('kisansetu_offers', JSON.stringify(updated));
+    } catch (e) {}
+    showToast('🎉 Contract Offer Accepted! Partner notified.');
+
+    try {
+      await offersAPI.acceptOffer(offerId);
+    } catch (err) {}
+  };
+
+  const handleDeclineOffer = async (offerId) => {
+    const updated = buyerOffers.map((o) => o.id === offerId ? { ...o, status: 'rejected' } : o);
+    setBuyerOffers(updated);
+    try {
+      localStorage.setItem('kisansetu_offers', JSON.stringify(updated));
+    } catch (e) {}
+    showToast('Offer declined.');
+
+    try {
+      await offersAPI.rejectOffer(offerId);
+    } catch (err) {}
+  };
+
   const handleSaveProfile = (updated) => {
     const merged = { ...currentUser, ...updated };
     setCurrentUser(merged);
@@ -184,7 +296,7 @@ function App() {
       <>
         <LandingPage
           isLoggedIn={isLoggedIn}
-          onExploreApp={(targetTab = 'home') => handleTabChange(targetTab)}
+          onExploreApp={(targetTab = (activeRole === 'buyer' ? 'buyer-dashboard' : 'home')) => handleTabChange(targetTab)}
           onOpenAuth={(mode = 'signin') => {
             setAuthInitialMode(mode);
             setActiveTab('auth');
@@ -234,6 +346,8 @@ function App() {
         setActiveTab={handleTabChange}
         language={language}
         user={currentUser}
+        activeRole={activeRole}
+        onToggleRole={handleToggleRole}
       />
 
       {/* Main Content Area */}
@@ -246,12 +360,25 @@ function App() {
           setLanguage={handleSetLanguage}
           user={currentUser}
           onLogout={handleLogout}
+          activeRole={activeRole}
+          onToggleRole={handleToggleRole}
         />
 
         {/* View Viewport */}
         <main className="view-viewport">
           {activeTab === 'home' && (
             <HomeDashboard setActiveTab={setActiveTab} language={language} />
+          )}
+
+          {activeTab === 'buyer-dashboard' && (
+            <BuyerDashboard
+              farmerCrops={crops}
+              buyerOffers={buyerOffers}
+              onOpenPlaceOrderModal={(crop) => setSelectedCropForOrder(crop)}
+              onContactFarmer={() => setActiveTab('messages')}
+              setActiveTab={setActiveTab}
+              buyerUser={currentUser}
+            />
           )}
 
           {activeTab === 'price-radar' && (
@@ -280,6 +407,9 @@ function App() {
               setIsAddCropOpen={setIsAddCropOpen}
               setActiveTab={setActiveTab}
               language={language}
+              buyerOffers={buyerOffers}
+              onAcceptOffer={handleAcceptOffer}
+              onDeclineOffer={handleDeclineOffer}
             />
           )}
 
@@ -329,6 +459,14 @@ function App() {
         onClose={() => setSelectedBuyerForOffer(null)}
       />
 
+      <PlaceOrderModal
+        isOpen={Boolean(selectedCropForOrder)}
+        crop={selectedCropForOrder}
+        buyerUser={currentUser}
+        onClose={() => setSelectedCropForOrder(null)}
+        onSubmitOffer={handlePlaceOffer}
+      />
+
       <EditProfileModal
         isOpen={isEditProfileOpen}
         farmerData={currentUser}
@@ -347,3 +485,4 @@ function App() {
 }
 
 export default App;
+

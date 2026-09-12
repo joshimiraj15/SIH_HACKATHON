@@ -12,34 +12,47 @@ import {
   MessageSquare, 
   ChevronRight,
   Sparkles,
-  HelpCircle,
-  LogOut
+  ShoppingBag,
+  Repeat,
+  Store
 } from 'lucide-react';
 import { translations } from '../../data/translations';
 import '../../styles/Sidebar.css';
 
-const Sidebar = ({ activeTab, setActiveTab, language, user }) => {
+const Sidebar = ({ activeTab, setActiveTab, language, user, activeRole = 'farmer', onToggleRole }) => {
   const t = translations[language] || translations.en;
 
-  const navItems = [
+  const farmerNavItems = [
     { id: 'landing', label: 'Landing Page', icon: Sparkles, badge: 'New' },
     { id: 'home', label: t.navHome || 'Home', icon: Home },
+    { id: 'my-crops', label: t.navMyCrops || 'My Produce', icon: Sprout, badge: '4' },
     { id: 'market-prices', label: t.navMarketPrices || 'Market Prices', icon: TrendingUp },
     { id: 'price-radar', label: t.navPriceRadar || 'Mandi Radar', icon: Radar, badge: 'Live' },
     { id: 'where-to-sell', label: t.navWhereToSell || 'Where to Sell', icon: Compass },
-    { id: 'buyers', label: t.navBuyers || 'Buyers', icon: Users },
-    { id: 'my-crops', label: t.navMyCrops || 'My Produce', icon: Sprout, badge: '4' },
+    { id: 'buyers', label: t.navBuyers || 'Buyers Marketplace', icon: Users },
     { id: 'price-forecast', label: t.navPriceForecast || 'Forecast', icon: LineChart, badge: 'AI' },
     { id: 'schemes', label: t.navSchemes || 'Govt Schemes', icon: ShieldCheck },
-    { id: 'messages', label: t.navMessages || 'Messages', icon: MessageSquare }
+    { id: 'messages', label: t.navMessages || 'Messages & Offers', icon: MessageSquare }
   ];
+
+  const buyerNavItems = [
+    { id: 'landing', label: 'Landing Page', icon: Sparkles, badge: 'New' },
+    { id: 'buyer-dashboard', label: 'Procurement Hub', icon: ShoppingBag, badge: 'Buyer' },
+    { id: 'buyers', label: 'Verified Buyers', icon: Store },
+    { id: 'market-prices', label: t.navMarketPrices || 'Market Prices', icon: TrendingUp },
+    { id: 'price-radar', label: t.navPriceRadar || 'Mandi Radar', icon: Radar, badge: 'Live' },
+    { id: 'messages', label: t.navMessages || 'Farmer Messages', icon: MessageSquare }
+  ];
+
+  const isBuyerMode = activeRole === 'buyer';
+  const navItems = isBuyerMode ? buyerNavItems : farmerNavItems;
 
   return (
     <aside className="kisan-sidebar">
       {/* Brand Header */}
       <div 
         className="kisan-brand" 
-        onClick={() => setActiveTab('home')} 
+        onClick={() => setActiveTab(isBuyerMode ? 'buyer-dashboard' : 'home')} 
         style={{ cursor: 'pointer' }}
       >
         <div className="brand-icon-wrapper">
@@ -52,6 +65,38 @@ const Sidebar = ({ activeTab, setActiveTab, language, user }) => {
           <h2>Kishan<span>Setu</span></h2>
           <span className="brand-tagline">Agri Intelligence Platform</span>
         </div>
+      </div>
+
+      {/* Role Switcher Pill */}
+      <div style={{ padding: '0 16px 14px 16px' }}>
+        <button
+          type="button"
+          onClick={onToggleRole}
+          style={{
+            width: '100%',
+            background: isBuyerMode ? 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)' : 'linear-gradient(135deg, #166534 0%, #14532D 100%)',
+            color: '#FFFFFF',
+            border: 'none',
+            borderRadius: '14px',
+            padding: '10px 14px',
+            fontSize: '0.82rem',
+            fontWeight: '700',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
+            transition: 'all 0.2s ease'
+          }}
+          title="Click to toggle between Farmer (Seller) and Buyer (Procurement) Mode"
+        >
+          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            {isBuyerMode ? '🏢 Buyer Mode' : '🌾 Farmer Mode'}
+          </span>
+          <span style={{ fontSize: '0.74rem', background: 'rgba(255,255,255,0.2)', padding: '2px 8px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Repeat size={11} /> Switch
+          </span>
+        </button>
       </div>
 
       {/* Main Navigation List */}
@@ -73,7 +118,7 @@ const Sidebar = ({ activeTab, setActiveTab, language, user }) => {
                 <span className="label">{item.label}</span>
               </div>
               {item.badge && (
-                <span className={`nav-badge ${item.badge === 'Live' ? 'badge-live' : ''} ${item.badge === 'AI' ? 'badge-ai' : ''}`}>
+                <span className={`nav-badge ${item.badge === 'Live' ? 'badge-live' : ''} ${item.badge === 'AI' ? 'badge-ai' : ''} ${item.badge === 'Buyer' ? 'badge-live' : ''}`}>
                   {item.badge}
                 </span>
               )}
@@ -82,7 +127,7 @@ const Sidebar = ({ activeTab, setActiveTab, language, user }) => {
         })}
       </nav>
 
-      {/* Footer Area: Farmer Profile Card */}
+      {/* Footer Area: Farmer/Buyer Profile Card */}
       <div className="sidebar-footer">
         <div 
           className="farmer-pill" 
@@ -91,15 +136,15 @@ const Sidebar = ({ activeTab, setActiveTab, language, user }) => {
         >
           <div className="farmer-avatar-wrap">
             <img 
-              src={user?.avatar || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80"} 
-              alt={user?.name || "Farmer"} 
+              src={user?.avatar || (isBuyerMode ? "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80" : "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80")} 
+              alt={user?.name || "User"} 
               className="farmer-avatar-img"
             />
             <span className="online-dot" />
           </div>
           <div className="farmer-info">
-            <div className="farmer-name">{user?.name || "Meet Maniya"}</div>
-            <div className="farmer-role">{(user?.role || "Farmer")} • {(user?.district || "Rajkot")}</div>
+            <div className="farmer-name">{user?.name || (isBuyerMode ? "AgroFresh Foods" : "Meet Maniya")}</div>
+            <div className="farmer-role">{(isBuyerMode ? "Buyer" : "Farmer")} • {(user?.location?.split(',')[0] || "Rajkot")}</div>
           </div>
           <ChevronRight size={15} className="farmer-settings-icon" />
         </div>
@@ -109,3 +154,4 @@ const Sidebar = ({ activeTab, setActiveTab, language, user }) => {
 };
 
 export default Sidebar;
+

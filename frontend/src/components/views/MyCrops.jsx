@@ -1,4 +1,3 @@
-// src/components/views/MyCrops.jsx
 import React from 'react';
 import { 
   Plus, 
@@ -11,19 +10,24 @@ import {
   PlusCircle, 
   Sprout, 
   Info,
-  Droplets
+  Droplets,
+  ShoppingBag,
+  Check,
+  X,
+  Clock
 } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { recentActivities } from '../../data/mockData';
 import '../../styles/MyCrops.css';
 
-const MyCrops = ({ crops, setIsAddCropOpen, setActiveTab }) => {
+const MyCrops = ({ crops, setIsAddCropOpen, setActiveTab, buyerOffers = [], onAcceptOffer, onDeclineOffer }) => {
   return (
     <div className="my-crops-container">
       {/* Header */}
       <div className="my-crops-header">
         <div>
-          <h1>My Crops</h1>
-          <p>Track your crops, get insights and manage your produce</p>
+          <h1>My Produce & Crop Inventory</h1>
+          <p>Manage your crop lots, set pricing, view market trends, and accept buyer contract offers</p>
         </div>
 
         <button 
@@ -31,7 +35,7 @@ const MyCrops = ({ crops, setIsAddCropOpen, setActiveTab }) => {
           onClick={() => setIsAddCropOpen(true)}
         >
           <Plus size={18} />
-          <span>Add Crop</span>
+          <span>Add Crop Lot</span>
         </button>
       </div>
 
@@ -72,6 +76,152 @@ const MyCrops = ({ crops, setIsAddCropOpen, setActiveTab }) => {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Incoming Buyer Purchase Offers */}
+      <div style={{
+        background: '#FFFFFF',
+        border: '1px solid #E2E8F0',
+        borderRadius: '20px',
+        padding: '24px',
+        marginBottom: '28px',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.03)'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <div>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#0F172A', margin: 0 }}>
+              📥 Incoming Buyer Contract Offers ({buyerOffers.length})
+            </h3>
+            <p style={{ fontSize: '0.85rem', color: '#64748B', margin: '4px 0 0 0' }}>
+              Direct procurement offers submitted by verified traders and institutional buyers
+            </p>
+          </div>
+
+          <button
+            type="button"
+            className="cat-tab-btn"
+            style={{ fontSize: '0.8rem', padding: '6px 12px' }}
+            onClick={() => setActiveTab('messages')}
+          >
+            View Messages →
+          </button>
+        </div>
+
+        {buyerOffers.length === 0 ? (
+          <div style={{
+            background: '#F8FAFC',
+            border: '1px dashed #CBD5E1',
+            borderRadius: '16px',
+            padding: '28px',
+            textAlign: 'center',
+            color: '#64748B'
+          }}>
+            <ShoppingBag size={36} color="#94A3B8" style={{ marginBottom: '8px' }} />
+            <div style={{ fontWeight: '700', color: '#334155' }}>No Active Offers Pending</div>
+            <div style={{ fontSize: '0.82rem' }}>Buyer purchase offers for your listed crop lots will appear here automatically.</div>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
+            {buyerOffers.map((o) => (
+              <div key={o.id} style={{
+                background: o.status === 'accepted' ? '#F0FDF4' : '#F8FAFC',
+                border: o.status === 'accepted' ? '1.5px solid #86EFAC' : '1px solid #E2E8F0',
+                borderRadius: '16px',
+                padding: '18px',
+                display: 'flex',
+                flexDirection: 'column',
+                justify: 'space-between'
+              }}>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                    <div>
+                      <span style={{ fontSize: '0.74rem', background: '#E2E8F0', padding: '2px 8px', borderRadius: '10px', fontWeight: '700', color: '#334155' }}>
+                        {o.cropName}
+                      </span>
+                      <h4 style={{ fontSize: '1.05rem', fontWeight: '800', color: '#0F172A', margin: '4px 0 0 0' }}>
+                        {o.buyerName}
+                      </h4>
+                    </div>
+
+                    <span style={{
+                      fontSize: '0.75rem',
+                      fontWeight: '700',
+                      padding: '3px 8px',
+                      borderRadius: '10px',
+                      background: o.status === 'accepted' ? '#DCFCE7' : o.status === 'rejected' ? '#FEE2E2' : '#FEF3C7',
+                      color: o.status === 'accepted' ? '#166534' : o.status === 'rejected' ? '#991B1B' : '#D97706'
+                    }}>
+                      {o.status === 'accepted' ? '✓ Accepted' : o.status === 'rejected' ? 'Declined' : 'Pending'}
+                    </span>
+                  </div>
+
+                  <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '10px 12px', margin: '10px 0' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
+                      <span style={{ color: '#64748B' }}>Offered Rate:</span>
+                      <strong style={{ color: '#166534', fontSize: '0.95rem' }}>₹{o.offeredPrice.toLocaleString()} / Q</strong>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginTop: '4px' }}>
+                      <span style={{ color: '#64748B' }}>Quantity Requested:</span>
+                      <strong>{o.quantity} Quintals</strong>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginTop: '4px', paddingTop: '4px', borderTop: '1px dashed #E2E8F0' }}>
+                      <span style={{ color: '#64748B' }}>Total Value:</span>
+                      <strong style={{ color: '#0F172A' }}>₹{o.totalValue.toLocaleString()}</strong>
+                    </div>
+                  </div>
+
+                  {o.notes && (
+                    <div style={{ fontSize: '0.78rem', color: '#475569', fontStyle: 'italic', marginBottom: '12px' }}>
+                      "{o.notes}"
+                    </div>
+                  )}
+                </div>
+
+                {o.status === 'pending' && (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '10px' }}>
+                    <button
+                      type="button"
+                      onClick={() => onDeclineOffer && onDeclineOffer(o.id)}
+                      style={{
+                        background: '#F1F5F9',
+                        border: '1px solid #CBD5E1',
+                        color: '#475569',
+                        padding: '8px',
+                        borderRadius: '10px',
+                        fontWeight: '700',
+                        fontSize: '0.8rem',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Decline
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        try {
+                          confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 } });
+                        } catch (e) {}
+                        onAcceptOffer && onAcceptOffer(o.id);
+                      }}
+                      style={{
+                        background: '#166534',
+                        border: 'none',
+                        color: '#FFFFFF',
+                        padding: '8px',
+                        borderRadius: '10px',
+                        fontWeight: '700',
+                        fontSize: '0.8rem',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Accept Offer →
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Bottom Grid: Crop Health & Advisory + Recent Activities */}
@@ -140,3 +290,4 @@ const MyCrops = ({ crops, setIsAddCropOpen, setActiveTab }) => {
 };
 
 export default MyCrops;
+
