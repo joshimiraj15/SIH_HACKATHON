@@ -1,0 +1,106 @@
+/* src/styles/theme.css - Modern KishanSetu Agricultural Design System */
+
+:root {
+  /* Main Backgrounds & Surfaces */
+  --bg-body: #F4F6F9;
+  --bg-main: #F4F6F9;
+  --bg-card: #FFFFFF;
+  --bg-card-muted: #F8F9FA;
+  --bg-glass: rgba(255, 255, 255, 0.92);
+
+  /* Sidebar Palette - Crisp Clean White (Ref: 3.webp) */
+  --bg-sidebar: #FFFFFF;
+  --bg-sidebar-darker: #F8F9FA;
+  --bg-sidebar-hover: #F2F4F7;
+  --bg-sidebar-active: #FFF2EE;
+  --sidebar-text: #4B5563;
+  --sidebar-text-muted: #9CA3AF;
+  --sidebar-active-text: #FF5A36;
+  --sidebar-accent: #FF5A36;
+
+  /* Primary Brand - Forest Green & Emerald */
+  --primary: #15803D;
+  --primary-dark: #0F5C2B;
+  --primary-light: #22C55E;
+  --primary-subtle: #DCFCE7;
+  --primary-border: #BBF7D0;
+
+  /* Vibrant Accent Colors */
+  --coral-primary: #FF5A36;
+  --coral-light: #FF7E61;
+  --coral-subtle: #FFF2EE;
+  --amber-primary: #D97706;
+  --amber-light: #F59E0B;
+  --amber-subtle: #FEF3C7;
+  --amber-border: #FDE68A;
+  
+  /* Status Colors */
+  --success: #10B981;
+  --success-bg: #ECFDF5;
+  --success-border: #A7F3D0;
+  --danger: #EF4444;
+  --danger-bg: #FEF2F2;
+  --danger-border: #FECACA;
+  --info: #3B82F6;
+  --info-bg: #EFF6FF;
+
+  /* Neutrals & Typography */
+  --text-main: #111827;
+  --text-body: #374151;
+  --text-muted: #6B7280;
+  --text-light: #9CA3AF;
+  --border-color: #E5E7EB;
+  --border-subtle: #F3F4F6;
+
+  /* Modern Card Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 12px 28px -4px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 10px 24px rgba(0, 0, 0, 0.08);
+
+  /* Border Radii */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-pill: 9999px;
+
+  /* Typography */
+  --font-family: 'Inter', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Global Reset & Base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Smooth Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
