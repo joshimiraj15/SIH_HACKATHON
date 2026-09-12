@@ -1,0 +1,86 @@
+.market-ticker-container {
+  display: flex;
+  align-items: center;
+  background-color: var(--primary-dark, #234414);
+  color: white;
+  height: 40px;
+  overflow: hidden;
+  font-family: var(--font-family, 'Inter', sans-serif);
+  font-size: 14px;
+}
+
+.ticker-label {
+  background-color: var(--coral-primary, #8D123F);
+  color: white;
+  padding: 0 16px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.ticker-wrapper {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+}
+
+.ticker-content {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: max-content;
+  animation: ticker-slide 30s linear infinite;
+}
+
+.ticker-content:hover {
+  animation-play-state: paused;
+}
+
+.ticker-item {
+  display: flex;
+  align-items: center;
+  margin-right: 40px;
+  white-space: nowrap;
+}
+
+.ticker-name {
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.ticker-price {
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+.ticker-trend {
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
+}
+
+.ticker-trend.up {
+  color: #4ade80; /* light green */
+}
+
+.ticker-trend.down {
+  color: #f87171; /* light red */
+}
+
+.ticker-highlow {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+@keyframes ticker-slide {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}

@@ -1,0 +1,696 @@
+/* src/styles/HomeDashboard.css - Modern Dashboard Styling (Ref: 3.webp) */
+
+.home-dashboard-container {
+  padding: 24px 32px 48px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1440px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ════ TOP 3-COLUMN GRID ════ */
+.home-top-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.95fr 0.9fr;
+  gap: 20px;
+  align-items: stretch;
+}
+
+@media (max-width: 1200px) {
+  .home-top-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 800px) {
+  .home-top-grid {
+    grid-template-columns: 1fr;
+  }
+  .home-dashboard-container {
+    padding: 16px;
+  }
+}
+
+/* ─── COLUMN 1: OVERVIEW & BALANCE CARD ─── */
+.overview-balance-card {
+  background: #FFFFFF;
+  border-radius: 22px;
+  padding: 24px 26px;
+  border: 1px solid #EAECEF;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.ov-header {
+  margin-bottom: 8px;
+}
+
+.ov-eyebrow {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.01em;
+}
+
+.ov-sublabel {
+  font-size: 0.74rem;
+  color: #6B7280;
+  margin-top: 2px;
+}
+
+.ov-trend {
+  color: #10B981;
+  font-weight: 700;
+  margin-left: 4px;
+}
+
+.ov-balance-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 0 20px 0;
+}
+
+.ov-balance-num {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.ov-cents {
+  font-size: 1.25rem;
+  color: #9CA3AF;
+  font-weight: 600;
+}
+
+.ov-gain-pill {
+  background: #DCFCE7;
+  color: #15803D;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* 4 Quick Actions */
+.ov-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid #F3F4F6;
+}
+
+.ov-action-item {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.2s;
+  font-family: inherit;
+}
+
+.ov-action-item:hover {
+  transform: translateY(-2px);
+}
+
+.ov-action-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.ov-action-circle.bg-amber {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+.ov-action-circle.bg-green {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.ov-action-circle.bg-coral {
+  background: #FFE2DA;
+  color: #FF5A36;
+}
+
+.ov-action-circle.bg-blue {
+  background: #E0F2FE;
+  color: #0284C7;
+}
+
+.ov-action-item:hover .ov-action-circle {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ov-action-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #4B5563;
+}
+
+/* ─── COLUMN 2: LEARNING CENTER CARD ─── */
+.learning-center-card {
+  background: linear-gradient(135deg, #0284C7 0%, #0369A1 50%, #075985 100%);
+  border-radius: 22px;
+  padding: 24px;
+  color: #FFFFFF;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 6px 20px rgba(3, 105, 161, 0.25);
+}
+
+.learning-center-card::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  pointer-events: none;
+}
+
+.learning-center-card::after {
+  content: '🌾';
+  position: absolute;
+  right: 18px;
+  bottom: 12px;
+  font-size: 4rem;
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.learning-card-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+}
+
+.learning-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  width: fit-content;
+  backdrop-filter: blur(4px);
+  margin-bottom: 12px;
+}
+
+.learning-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: -0.02em;
+  margin: 0 0 6px 0;
+}
+
+.learning-desc {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.88);
+  margin-bottom: 20px;
+}
+
+.learning-btn {
+  background: #FFFFFF;
+  color: #0369A1;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  width: fit-content;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.learning-btn:hover {
+  background: #F0F9FF;
+  transform: translateY(-1px);
+}
+
+/* ─── COLUMN 3: SPOTLIGHT FARM CARD (Stockton Farm style) ─── */
+.spotlight-farm-card {
+  background: #FFFFFF;
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid #EAECEF;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+}
+
+.spotlight-img-wrap {
+  position: relative;
+  height: 110px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.spotlight-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.spotlight-tag {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #111827;
+  color: #FFFFFF;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+}
+
+.spotlight-body {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  justify-content: space-between;
+}
+
+.spotlight-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.spotlight-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0;
+}
+
+.spotlight-loc {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  color: #6B7280;
+  margin-top: 2px;
+}
+
+.spotlight-crop-pill {
+  background: #F3F4F6;
+  color: #374151;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.spotlight-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.meta-label {
+  color: #6B7280;
+  font-size: 0.74rem;
+}
+
+.meta-value {
+  font-weight: 700;
+  color: #15803D;
+}
+
+.spotlight-quota-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.quota-label-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: #6B7280;
+  font-weight: 500;
+}
+
+.quota-bar-track {
+  width: 100%;
+  height: 6px;
+  background: #F3F4F6;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.quota-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10B981, #059669);
+  border-radius: 999px;
+}
+
+.spotlight-action-btn {
+  width: 100%;
+  background: #FF5A36;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 999px;
+  padding: 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(255, 90, 54, 0.25);
+}
+
+.spotlight-action-btn:hover {
+  background: #E04B2A;
+  transform: translateY(-1px);
+}
+
+/* ════ BOTTOM SECTION: DEALS TABLE CARD ════ */
+.deals-table-card {
+  background: #FFFFFF;
+  border-radius: 22px;
+  padding: 24px;
+  border: 1px solid #EAECEF;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+}
+
+.deals-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.deals-table-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+.deals-table-subtitle {
+  font-size: 0.78rem;
+  color: #6B7280;
+  margin-top: 2px;
+}
+
+.deals-table-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+.deals-date-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #F8F9FA;
+  border: 1px solid #E5E7EB;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #4B5563;
+}
+
+.deals-export-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #FF5A36;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(255, 90, 54, 0.2);
+}
+
+.deals-export-btn:hover {
+  background: #E04B2A;
+  transform: translateY(-1px);
+}
+
+.export-toast {
+  position: absolute;
+  top: -30px;
+  right: 0;
+  background: #111827;
+  color: #FFFFFF;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  animation: toastPop 0.2s ease;
+}
+
+@keyframes toastPop {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Table */
+.deals-table-wrapper {
+  overflow-x: auto;
+}
+
+.deals-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.deals-table th {
+  padding: 12px 14px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid #F0F2F5;
+}
+
+.deals-table td {
+  padding: 14px;
+  font-size: 0.84rem;
+  color: #374151;
+  border-bottom: 1px solid #F8F9FA;
+  vertical-align: middle;
+}
+
+.deals-table-row:hover td {
+  background: #FBFBFC;
+}
+
+.cell-num {
+  font-weight: 600;
+  color: #9CA3AF;
+  font-size: 0.78rem;
+}
+
+.farm-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.farm-icon-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #F3F4F6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.farm-name {
+  font-weight: 700;
+  color: #111827;
+  font-size: 0.86rem;
+}
+
+.farm-sub {
+  font-size: 0.72rem;
+  color: #6B7280;
+  margin-top: 1px;
+}
+
+.category-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #F3F4F6;
+  color: #4B5563;
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+.amount-text {
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.amount-text.gain {
+  color: #10B981;
+}
+
+.amount-text.loss {
+  color: #EF4444;
+}
+
+/* Status Pills */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status-green {
+  background: #ECFDF5;
+  color: #059669;
+}
+
+.status-green .status-dot {
+  background: #10B981;
+}
+
+.status-red {
+  background: #FEF2F2;
+  color: #DC2626;
+}
+
+.status-red .status-dot {
+  background: #EF4444;
+}
+
+.status-yellow {
+  background: #FFFBEB;
+  color: #D97706;
+}
+
+.status-yellow .status-dot {
+  background: #F59E0B;
+}
+
+.row-action-btn {
+  background: none;
+  border: none;
+  color: #9CA3AF;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.row-action-btn:hover {
+  background: #F3F4F6;
+  color: #111827;
+}
+
+/* ════ SECONDARY: LIVE MARKET FEED ════ */
+.home-market-feed-section {
+  background: #FFFFFF;
+  border-radius: 22px;
+  padding: 24px;
+  border: 1px solid #EAECEF;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+}
+
+.market-feed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.feed-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+.feed-sub {
+  font-size: 0.78rem;
+  color: #6B7280;
+  margin-top: 2px;
+}
+
+.feed-view-all-btn {
+  background: none;
+  border: none;
+  color: #15803D;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.2s;
+}
+
+.feed-view-all-btn:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
