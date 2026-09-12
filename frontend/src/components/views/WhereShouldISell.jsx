@@ -10,15 +10,65 @@ import {
   Compass, 
   Truck, 
   CheckCircle2,
-  DollarSign
+  DollarSign,
+  Loader2
 } from 'lucide-react';
 import { whereToSellComparison } from '../../data/mockData';
+import { pricesAPI } from '../../services/api';
 import '../../styles/WhereShouldISell.css';
 
 const WhereShouldISell = ({ setActiveTab }) => {
   const [crop, setCrop] = useState('Wheat');
   const [quantity, setQuantity] = useState('500 kg');
   const [location, setLocation] = useState('Rajkot');
+  const [comparisons, setComparisons] = useState(whereToSellComparison);
+  const [loading, setLoading] = useState(false);
+  const [bestMandiData, setBestMandiData] = useState({
+    mandi: 'Rajkot APMC',
+    price: '₹2,610',
+    extra: '+ ₹1,920 more than nearby mandi',
+    revenue: '₹12,400',
+    transport: '- ₹850',
+    net: '₹11,550'
+  });
+
+  const handleFindBest = async () => {
+    setLoading(true);
+    try {
+      const res = await pricesAPI.getPriceComparison(crop);
+      if (res.success && res.data && res.data.length > 0) {
+        const topMarket = res.bestMarket;
+        const qtyNum = parseFloat(quantity) || 5; // quintals approx
+        const priceNum = topMarket?.price || 2600;
+        const gross = Math.round(priceNum * (qtyNum / 100));
+        const transport = 850;
+        const net = Math.max(0, gross - transport);
+
+        setBestMandiData({
+          mandi: `${topMarket?.marketName || 'Rajkot'} APMC`,
+          price: `₹${priceNum.toLocaleString()}`,
+          extra: `Highest rate in ${topMarket?.district || 'region'}`,
+          revenue: `₹${gross.toLocaleString()}`,
+          transport: `- ₹${transport}`,
+          net: `₹${net.toLocaleString()}`
+        });
+
+        const newRows = res.data.slice(0, 4).map((m, idx) => ({
+          mandi: `${m._id || m.marketName} APMC`,
+          priceStr: `₹${(m.latestPrice || m.modalPrice || 2500).toLocaleString()}`,
+          distance: `${12 + idx * 8} km`,
+          netEarnings: `₹${Math.max(0, Math.round((m.latestPrice || 2500) * (qtyNum / 100)) - (500 + idx * 200)).toLocaleString()}`,
+          isBest: idx === 0,
+          highlight: idx === 0 ? 'Best Price' : null
+        }));
+        setComparisons(newRows);
+      }
+    } catch (e) {
+      console.warn('Fallback to mock comparison');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="where-to-sell-container">
@@ -69,9 +119,9 @@ const WhereShouldISell = ({ setActiveTab }) => {
           </div>
         </div>
 
-        <button className="where-find-btn">
+        <button className="where-find-btn" onClick={handleFindBest} disabled={loading}>
           <Compass size={16} />
-          <span>Find Best Option</span>
+          <span>{loading ? 'Analyzing Mandis...' : 'Find Best Option'}</span>
         </button>
       </div>
 
@@ -85,27 +135,27 @@ const WhereShouldISell = ({ setActiveTab }) => {
               <div className="best-option-badge-tag">
                 <Award size={14} /> Best Option
               </div>
-              <div className="best-mandi-title">Rajkot APMC</div>
+              <div className="best-mandi-title">{bestMandiData.mandi}</div>
               <div className="best-mandi-rate">
-                ₹2,610 <span>/ Q</span>
+                {bestMandiData.price} <span>/ Q</span>
               </div>
               <div className="best-mandi-extra">
-                <ArrowUpRight size={14} /> + ₹1,920 more than nearby mandi
+                <ArrowUpRight size={14} /> {bestMandiData.extra}
               </div>
             </div>
 
             <div className="best-option-calc">
               <div className="calc-line">
                 <span>Expected Revenue</span>
-                <strong>₹12,400</strong>
+                <strong>{bestMandiData.revenue}</strong>
               </div>
               <div className="calc-line expense">
                 <span>Transport</span>
-                <strong>- ₹850</strong>
+                <strong>{bestMandiData.transport}</strong>
               </div>
               <div className="calc-line net">
                 <span>Net Earnings</span>
-                <span className="net-amount">₹11,550</span>
+                <span className="net-amount">{bestMandiData.net}</span>
               </div>
             </div>
           </div>
@@ -142,7 +192,7 @@ const WhereShouldISell = ({ setActiveTab }) => {
                 </tr>
               </thead>
               <tbody>
-                {whereToSellComparison.map((row, idx) => (
+                {comparisons.map((row, idx) => (
                   <tr key={idx} className={row.isBest ? 'highlight-best' : ''}>
                     <td>
                       {row.mandi}
