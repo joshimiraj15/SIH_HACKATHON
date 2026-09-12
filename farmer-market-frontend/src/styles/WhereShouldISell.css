@@ -1,0 +1,342 @@
+/* src/styles/WhereShouldISell.css */
+
+.where-to-sell-container {
+  padding: 24px 32px 40px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.where-header h1 {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #14281d;
+  margin-bottom: 4px;
+}
+
+.where-header p {
+  font-size: 0.9rem;
+  color: #526056;
+}
+
+/* Filter Bar */
+.where-filter-card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 16px 24px;
+  border: 1px solid #e5ede7;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.where-filters-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.where-filter-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 150px;
+}
+
+.where-filter-box label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.where-find-btn {
+  background: #15803d;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 10px 24px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 10px rgba(21, 128, 61, 0.25);
+  align-self: flex-end;
+}
+
+.where-find-btn:hover {
+  background: #166534;
+}
+
+/* Two Column Layout */
+.where-main-grid {
+  display: grid;
+  grid-template-columns: 2.2fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 1024px) {
+  .where-main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.where-left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Golden Best Option Card */
+.best-option-card {
+  background: linear-gradient(135deg, #fffdf2 0%, #fefce8 60%, #f0fdf4 100%);
+  border: 1.5px solid #fde047;
+  border-radius: var(--radius-lg);
+  padding: 22px 28px;
+  box-shadow: 0 4px 14px rgba(234, 179, 8, 0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.best-option-info {
+  flex: 1;
+}
+
+.best-option-badge-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #15803d;
+  color: #ffffff;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 99px;
+  margin-bottom: 10px;
+}
+
+.best-mandi-title {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #14281d;
+  margin-bottom: 4px;
+}
+
+.best-mandi-rate {
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #15803d;
+  margin-bottom: 6px;
+}
+
+.best-mandi-rate span {
+  font-size: 0.95rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.best-mandi-extra {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Right Financial breakdown */
+.best-option-calc {
+  background: #ffffff;
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid #f1f5f9;
+  min-width: 220px;
+  box-shadow: var(--shadow-sm);
+}
+
+.calc-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.calc-line.expense {
+  color: #dc2626;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.calc-line.net {
+  margin-top: 8px;
+  margin-bottom: 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #14281d;
+}
+
+.calc-line.net .net-amount {
+  color: #15803d;
+  font-size: 1.25rem;
+}
+
+/* Why Best Option Badges */
+.why-best-section {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  border: 1px solid #e5ede7;
+}
+
+.why-best-section h4 {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #14281d;
+  margin-bottom: 12px;
+}
+
+.why-badges-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.why-badge-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+  padding: 8px 14px;
+  border-radius: 99px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+/* Nearby Mandis Comparison Table */
+.nearby-table-card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  border: 1px solid #e5ede7;
+  box-shadow: var(--shadow-card);
+}
+
+.nearby-table-card h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #14281d;
+  margin-bottom: 14px;
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.86rem;
+}
+
+.comparison-table th {
+  padding: 10px 14px;
+  background: #f8faf8;
+  color: #64748b;
+  font-weight: 600;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid #e5ede7;
+}
+
+.comparison-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1f2937;
+}
+
+.comparison-table tr:hover {
+  background: #fbfdfb;
+}
+
+.comparison-table tr.highlight-best {
+  background: #f0fdf4;
+  font-weight: 600;
+}
+
+.comparison-table tr.highlight-best td:first-child {
+  border-left: 3px solid #16a34a;
+}
+
+.table-best-tag {
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+}
+
+/* Right Promo Farmer Card */
+.where-right-promo-card {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  position: relative;
+  background: linear-gradient(180deg, #13462f 0%, #0c2d1e 100%);
+  color: #ffffff;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+}
+
+.promo-farmer-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 65%;
+  object-fit: cover;
+  opacity: 0.65;
+}
+
+.promo-quote-box {
+  position: relative;
+  z-index: 2;
+  background: rgba(11, 45, 29, 0.85);
+  backdrop-filter: blur(8px);
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.promo-quote-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #86efac;
+  line-height: 1.3;
+  margin-bottom: 6px;
+}
+
+.promo-quote-sub {
+  font-size: 0.8rem;
+  color: #d1fae5;
+  line-height: 1.4;
+}

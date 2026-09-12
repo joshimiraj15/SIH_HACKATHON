@@ -26,6 +26,10 @@ const orderSchema = new mongoose.Schema(
       required: [true, 'Order quantity is required'],
       min: [1, 'Quantity must be at least 1'],
     },
+    unit: {
+      type: String,
+      default: 'quintal',
+    },
     pricePerUnit: {
       type: Number,
       required: [true, 'Price per unit is required'],
@@ -34,32 +38,58 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'Total amount is required'],
     },
+    orderStatus: {
+      type: String,
+      enum: ['placed', 'confirmed', 'in_transit', 'delivered', 'completed', 'cancelled'],
+      default: 'placed',
+    },
     paymentStatus: {
       type: String,
-      enum: ['pending', 'completed', 'failed', 'refunded'],
+      enum: ['pending', 'in_escrow', 'released_to_farmer', 'completed', 'refunded'],
       default: 'pending',
     },
     paymentMethod: {
       type: String,
       enum: ['UPI', 'NetBanking', 'Card', 'COD', 'Escrow'],
-      default: 'COD',
+      default: 'Escrow',
     },
-    orderStatus: {
+    trackingNumber: {
       type: String,
-      enum: ['placed', 'confirmed', 'in_transit', 'delivered', 'cancelled'],
-      default: 'placed',
+      default: () => 'KS-' + Math.floor(100000 + Math.random() * 900000),
+    },
+    estimatedDeliveryDate: {
+      type: Date,
+      default: () => new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
     },
     shippingAddress: {
-      street: { type: String, trim: true },
-      village: { type: String, trim: true },
-      district: { type: String, trim: true },
-      state: { type: String, trim: true },
-      pincode: { type: String, trim: true },
+      street: { type: String, trim: true, default: 'Warehouse Hub 4' },
+      district: { type: String, trim: true, default: 'Rajkot' },
+      state: { type: String, trim: true, default: 'Gujarat' },
+      pincode: { type: String, trim: true, default: '360001' },
     },
+    timeline: [
+      {
+        status: { type: String },
+        note: { type: String },
+        timestamp: { type: Date, default: Date.now },
+      },
+    ],
   },
   {
     timestamps: true,
   }
 );
+
+orderSchema.pre('save', function (next) {
+  if (this.isModified('orderStatus') && this.orderStatus) {
+    if (!this.timeline) this.timeline = [];
+    this.timeline.push({
+      status: this.orderStatus,
+      note: `Order status updated to ${this.orderStatus}`,
+      timestamp: new Date(),
+    });
+  }
+  next();
+});
 
 module.exports = mongoose.model('Order', orderSchema);

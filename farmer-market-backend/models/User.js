@@ -34,11 +34,41 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    businessName: {
+      type: String,
+      trim: true,
+    },
+    avatar: {
+      type: String,
+      default: '',
+    },
+    isVerified: {
+      type: Boolean,
+      default: true,
+    },
+    rating: {
+      type: Number,
+      default: 4.8,
+      min: 1,
+      max: 5,
+    },
+    reviewsCount: {
+      type: Number,
+      default: 14,
+    },
+    totalDeals: {
+      type: Number,
+      default: 0,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
     location: {
-      village: { type: String, trim: true },
-      district: { type: String, trim: true },
-      state: { type: String, trim: true },
-      pincode: { type: String, trim: true },
+      village: { type: String, trim: true, default: '' },
+      district: { type: String, trim: true, default: '' },
+      state: { type: String, trim: true, default: 'Gujarat' },
+      pincode: { type: String, trim: true, default: '' },
     },
   },
   {

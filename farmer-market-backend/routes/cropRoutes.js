@@ -3,22 +3,18 @@ const router = express.Router();
 const {
   getAllCrops,
   getCropById,
+  getMyCrops,
   createCrop,
   updateCrop,
   deleteCrop,
-  getMyCrops,
 } = require('../controllers/cropController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
-router.route('/')
-  .get(getAllCrops)
-  .post(protect, authorize('farmer', 'admin'), createCrop);
-
-router.get('/my/listings', protect, authorize('farmer', 'admin'), getMyCrops);
-
-router.route('/:id')
-  .get(getCropById)
-  .put(protect, authorize('farmer', 'admin'), updateCrop)
-  .delete(protect, authorize('farmer', 'admin'), deleteCrop);
+router.get('/', getAllCrops);
+router.get('/my/listings', protect, getMyCrops);
+router.get('/:id', getCropById);
+router.post('/', protect, authorize('farmer', 'admin'), createCrop);
+router.put('/:id', protect, updateCrop);
+router.delete('/:id', protect, deleteCrop);
 
 module.exports = router;

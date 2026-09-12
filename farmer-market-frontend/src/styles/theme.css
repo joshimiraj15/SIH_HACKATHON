@@ -1,0 +1,172 @@
+/* src/styles/theme.css - KisanSetu Modern Agricultural Design System */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* Brand Palette - Deep Forest Green & Agriculture Accents */
+  --bg-sidebar: #0b2f1f;
+  --bg-sidebar-darker: #072216;
+  --bg-sidebar-hover: #13462f;
+  --bg-sidebar-active: #175438;
+  --sidebar-text: #d1fae5;
+  --sidebar-text-muted: #86efac;
+  --sidebar-active-text: #ffffff;
+  --sidebar-accent: #22c55e;
+  
+  /* Main Backgrounds & Surfaces */
+  --bg-body: #f4f8f5;
+  --bg-main: #f8faf8;
+  --bg-card: #ffffff;
+  --bg-card-muted: #f9fbf9;
+  --bg-glass: rgba(255, 255, 255, 0.85);
+  
+  /* Primary & Accents */
+  --primary: #15803d;
+  --primary-dark: #0f5c2b;
+  --primary-light: #22c55e;
+  --primary-subtle: #dcfce7;
+  --primary-border: #bbf7d0;
+  
+  /* Amber / Gold (Harvest / Highlight) */
+  --amber-primary: #d97706;
+  --amber-light: #f59e0b;
+  --amber-subtle: #fef3c7;
+  --amber-border: #fde68a;
+  --amber-dark: #92400e;
+  
+  /* Status Colors */
+  --success: #16a34a;
+  --success-bg: #dcfce7;
+  --success-border: #bbf7d0;
+  --danger: #dc2626;
+  --danger-bg: #fee2e2;
+  --danger-border: #fecaca;
+  --info: #0284c7;
+  --info-bg: #e0f2fe;
+  
+  /* Neutrals & Borders */
+  --text-main: #14281d;
+  --text-body: #374151;
+  --text-muted: #6b7280;
+  --text-light: #9ca3af;
+  --border-color: #e5e7eb;
+  --border-subtle: #f0f3f0;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+  --shadow-card: 0 2px 8px rgba(18, 56, 36, 0.06);
+  --shadow-card-hover: 0 8px 20px rgba(18, 56, 36, 0.12);
+  --shadow-glow: 0 0 15px rgba(34, 197, 94, 0.35);
+  
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-pill: 9999px;
+  
+  /* Typography */
+  --font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Global Reset & Base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Button & interactive resets */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+input, select, textarea {
+  font-family: inherit;
+}
+
+/* Night Mode (Dark Theme) */
+.night-mode {
+  --bg-body: #07150e;
+  --bg-main: #0a1c13;
+  --bg-card: #0f291c;
+  --bg-card-muted: #133324;
+  --bg-glass: rgba(15, 41, 28, 0.92);
+  --text-main: #f0fdf4;
+  --text-body: #d1fae5;
+  --text-muted: #86efac;
+  --text-light: #6ee7b7;
+  --border-color: rgba(34, 197, 94, 0.2);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --shadow-card: 0 4px 14px rgba(0, 0, 0, 0.35);
+  --shadow-card-hover: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.night-mode .kisan-header-wrapper {
+  background: rgba(10, 28, 19, 0.95);
+  border-bottom-color: rgba(34, 197, 94, 0.2);
+}
+
+.night-mode .header-search-bar {
+  background: #08170f;
+  border-color: rgba(34, 197, 94, 0.25);
+}
+
+.night-mode .header-search-bar input {
+  color: #f0fdf4;
+}
+
+.night-mode .screen-switcher-bar {
+  background: #07150e;
+  border-top-color: rgba(255, 255, 255, 0.05);
+}
+
+.night-mode .screen-pill {
+  background: #0f291c;
+  border-color: rgba(34, 197, 94, 0.2);
+  color: #a7f3d0;
+}
+
+.night-mode .screen-pill.active {
+  background: #16a34a;
+  color: #ffffff;
+}
+

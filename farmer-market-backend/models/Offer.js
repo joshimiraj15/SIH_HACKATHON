@@ -27,6 +27,9 @@ const offerSchema = new mongoose.Schema(
       required: [true, 'Please provide desired quantity'],
       min: [1, 'Quantity must be at least 1'],
     },
+    counterPrice: {
+      type: Number,
+    },
     totalAmount: {
       type: Number,
     },
@@ -35,9 +38,21 @@ const offerSchema = new mongoose.Schema(
       enum: ['pending', 'accepted', 'rejected', 'countered'],
       default: 'pending',
     },
+    deliveryTerms: {
+      type: String,
+      default: 'Buyer Pickup',
+    },
+    paymentTerms: {
+      type: String,
+      default: 'Escrow / On Delivery',
+    },
     message: {
       type: String,
       trim: true,
+    },
+    expiresAt: {
+      type: Date,
+      default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days default
     },
   },
   {
@@ -45,7 +60,6 @@ const offerSchema = new mongoose.Schema(
   }
 );
 
-// Calculate totalAmount before saving if not explicitly set
 offerSchema.pre('save', function (next) {
   if (this.offeredPrice && this.quantity) {
     this.totalAmount = this.offeredPrice * this.quantity;

@@ -2,17 +2,17 @@ const express = require('express');
 const router = express.Router();
 const {
   getMarketPrices,
-  getPriceByCrop,
+  getPriceRadar,
+  getWhereToSellRecommendations,
+  getPriceForecast,
   addMarketPrice,
-  getPriceTrends,
 } = require('../controllers/priceController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
-router.route('/')
-  .get(getMarketPrices)
-  .post(protect, authorize('admin'), addMarketPrice);
-
-router.get('/trends/:cropName', getPriceTrends);
-router.get('/:cropName', getPriceByCrop);
+router.get('/', getMarketPrices);
+router.get('/radar/:cropName', getPriceRadar);
+router.post('/where-to-sell', getWhereToSellRecommendations);
+router.get('/forecast/:cropName', getPriceForecast);
+router.post('/', protect, authorize('admin'), addMarketPrice);
 
 module.exports = router;

@@ -8,15 +8,14 @@ const generateToken = (id) => {
   });
 };
 
-// @desc    Register a new user (Farmer, Buyer, Admin)
+// @desc    Register a new user
 // @route   POST /api/auth/register
 // @access  Public
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, role, phone, location } = req.body;
+    const { name, email, password, role, phone, businessName, location } = req.body;
 
-    // Check if user already exists
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ email: email.toLowerCase() });
     if (userExists) {
       return res.status(400).json({
         success: false,
@@ -24,21 +23,22 @@ exports.register = async (req, res) => {
       });
     }
 
-    // Create user
     const user = await User.create({
       name,
-      email,
+      email: email.toLowerCase(),
       password,
       role: role || 'farmer',
       phone,
+      businessName,
       location,
+      isVerified: true,
     });
 
     const token = generateToken(user._id);
 
     res.status(201).json({
       success: true,
-      message: 'User registered successfully',
+      message: 'Registration successful',
       token,
       user: {
         id: user._id,
@@ -46,6 +46,10 @@ exports.register = async (req, res) => {
         email: user.email,
         role: user.role,
         phone: user.phone,
+        businessName: user.businessName,
+        avatar: user.avatar,
+        isVerified: user.isVerified,
+        rating: user.rating,
         location: user.location,
       },
     });
@@ -57,7 +61,7 @@ exports.register = async (req, res) => {
   }
 };
 
-// @desc    Authenticate user & get token
+// @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public
 exports.login = async (req, res) => {
@@ -71,21 +75,19 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Check for user
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid credentials',
+        message: 'Invalid email or password',
       });
     }
 
-    // Check if password matches
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid credentials',
+        message: 'Invalid email or password',
       });
     }
 
@@ -100,6 +102,10 @@ exports.login = async (req, res) => {
         email: user.email,
         role: user.role,
         phone: user.phone,
+        businessName: user.businessName,
+        avatar: user.avatar,
+        isVerified: user.isVerified,
+        rating: user.rating,
         location: user.location,
       },
     });
@@ -111,20 +117,66 @@ exports.login = async (req, res) => {
   }
 };
 
-// @desc    Get current logged in user profile
-// @route   GET /api/auth/profile
+// @desc    Get current user profile
+// @route   GET /api/auth/me
 // @access  Private
 exports.getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
     res.status(200).json({
       success: true,
       user,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Update user profile
+// @route   PUT /api/auth/profile
+// @access  Private
+exports.updateProfile = async (req, res) => {
+  try {
+    const fieldsToUpdate = {};
+    const allowed = ['name', 'phone', 'businessName', 'avatar', 'location'];
+    allowed.forEach((field) => {
+      if (req.body[field] !== undefined) fieldsToUpdate[field] = req.body[field];
     });
+
+    const user = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
+      new: true,
+      runValidators: true,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Quick demo logins for evaluation
+// @route   GET /api/auth/demo-users
+// @access  Public
+exports.getDemoUsers = async (req, res) => {
+  try {
+    const farmers = await User.find({ role: 'farmer' }).select('name email role phone businessName location').limit(2);
+    const buyers = await User.find({ role: 'buyer' }).select('name email role phone businessName location').limit(2);
+    const admin = await User.findOne({ role: 'admin' }).select('name email role phone businessName location');
+
+    res.status(200).json({
+      success: true,
+      farmers,
+      buyers,
+      admin,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
