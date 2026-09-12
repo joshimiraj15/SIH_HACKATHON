@@ -1,9 +1,9 @@
-// src/components/auth/AuthPage.jsx
 import React, { useState } from 'react';
 import confetti from 'canvas-confetti';
 import { translations } from '../../data/translations';
 import { farmerProfile } from '../../data/mockData';
 import authArt from '../../assets/auth-art.jpg';
+import { authAPI } from '../../services/api';
 import '../../styles/AuthPage.css';
 
 const AuthPage = ({
@@ -30,29 +30,44 @@ const AuthPage = ({
     setError(null);
     setLoading(true);
 
-    try {
-      const res = await fetch('http://localhost:4000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: email || 'meetmaniya@gmail.com',
-          password: password || 'farmer123'
-        })
-      });
-      const data = await res.json();
+    const inputVal = email.trim() || 'farmer@kishansetu.in';
+    const loginPass = password || 'farmer123';
 
-      if (data.success && data.user) {
-        onLoginSuccess(data.user, data.token);
+    try {
+      const res = await authAPI.login(inputVal, loginPass);
+
+      if (res.success && res.data) {
+        const userData = res.data;
+        onLoginSuccess({
+          ...farmerProfile,
+          ...userData,
+          name: userData.name || farmerProfile.name,
+          email: userData.email || inputVal,
+          location: userData.location || `${district}, Gujarat`
+        }, userData.token);
+      } else if (res.networkError) {
+        // Backend offline fallback - smooth login
+        onLoginSuccess({
+          ...farmerProfile,
+          name: inputVal.split('@')[0] || farmerProfile.name,
+          email: inputVal.includes('@') ? inputVal : `${inputVal}@kishansetu.in`,
+          phone: !inputVal.includes('@') ? inputVal : farmerProfile.phone,
+          location: `${district}, Gujarat`
+        }, 'mock-jwt-token-fallback');
       } else {
-        if (email.toLowerCase().includes('meet') || email.includes('98765') || email === '') {
+        if (inputVal.toLowerCase().includes('meet') || inputVal.includes('98765') || inputVal === '') {
           onLoginSuccess(farmerProfile, 'mock-jwt-token-meet-1');
         } else {
-          setError(data.message || 'Invalid email or password.');
+          setError(res.error || 'Invalid email/mobile or password.');
         }
       }
     } catch (err) {
       // Graceful offline fallback
-      onLoginSuccess(farmerProfile, 'mock-jwt-token-fallback');
+      onLoginSuccess({
+        ...farmerProfile,
+        email: inputVal.includes('@') ? inputVal : `${inputVal}@kishansetu.in`,
+        location: `${district}, Gujarat`
+      }, 'mock-jwt-token-fallback');
     } finally {
       setLoading(false);
     }
@@ -63,50 +78,65 @@ const AuthPage = ({
     setError(null);
     setLoading(true);
 
+    const inputVal = email.trim();
+    const isDigitsOnly = /^[0-9+\s\-]{8,15}$/.test(inputVal);
+
+    const finalPhone = isDigitsOnly ? inputVal : '+91 98765 43210';
+    const finalEmail = isDigitsOnly
+      ? `${inputVal.replace(/[^0-9]/g, '')}@kishansetu.in`
+      : (inputVal.includes('@') ? inputVal : `${inputVal || 'farmer'}@kishansetu.in`);
+
     const newUserData = {
       name: name.trim() || 'Kisan Partner',
-      email: email.trim() || 'farmer@kishansetu.in',
-      mobile: '+91 98765 43210',
+      email: finalEmail,
+      phone: finalPhone,
       password: password || 'farmer123',
-      district: district,
-      state: 'Gujarat',
-      landSize: '3.5 Acres',
-      primaryCrops: ['Wheat'],
       location: `${district}, Gujarat`,
       role: 'farmer'
     };
 
     try {
-      const res = await fetch('http://localhost:4000/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newUserData)
-      });
-      const data = await res.json();
+      const res = await authAPI.register(newUserData);
 
-      if (data.success && data.user) {
+      if (res.success && res.data) {
+        try {
+          confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } });
+        } catch (e) {}
+        const userData = res.data;
+        onLoginSuccess({
+          ...farmerProfile,
+          ...userData,
+          name: userData.name || newUserData.name,
+          email: userData.email || newUserData.email,
+          phone: userData.phone || newUserData.phone,
+          location: userData.location || newUserData.location,
+          avatar: farmerProfile.avatar
+        }, userData.token);
+      } else if (res.networkError) {
+        // Backend offline fallback - smooth account creation
         try {
           confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } });
         } catch (e) {}
         onLoginSuccess({
           ...farmerProfile,
-          ...data.user,
+          ...newUserData,
+          id: `KGP${Math.floor(100000 + Math.random() * 900000)}`,
           avatar: farmerProfile.avatar
-        }, data.token);
+        }, 'mock-register-token');
       } else {
-        setError(data.message || 'Registration failed.');
+        setError(res.error || 'Registration failed.');
       }
     } catch (err) {
       // Offline fallback
+      try {
+        confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } });
+      } catch (e) {}
       onLoginSuccess({
         ...farmerProfile,
         ...newUserData,
         id: `KGP${Math.floor(100000 + Math.random() * 900000)}`,
         avatar: farmerProfile.avatar
       }, 'mock-register-token');
-      try {
-        confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } });
-      } catch (e) {}
     } finally {
       setLoading(false);
     }

@@ -1,10 +1,10 @@
 // src/services/geminiService.js
 // Kisan AI Sahayak - Google Gemini API Integration
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AQ.Ab8RN6LGuOcs5QBMpEejJSrFKZyjZiyxdnCuqfe2sv35cbp8Zg';
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AQ.Ab8RN6KSnQLwjW_iJ1gLuFOjFMkZLaFdLtHEkBF-igIbBB-a_A';
 
 // Active models with fallback sequence
-const GEMINI_MODELS = ['gemini-3.5-flash-lite', 'gemini-3.6-flash'];
+const GEMINI_MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.6-flash'];
 
 /**
  * System prompt tailored for Gujarat & Indian agriculture, APMC mandi intelligence, and farmer advisory

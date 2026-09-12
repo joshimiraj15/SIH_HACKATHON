@@ -33,6 +33,7 @@ import KrishiWorldVideoModal from './components/modals/KrishiWorldVideoModal';
 // Mock Data & Translations
 import { myCropsData, farmerProfile } from './data/mockData';
 import { translations } from './data/translations';
+import { cropsAPI, authAPI, checkBackendHealth } from './services/api';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
@@ -55,7 +56,17 @@ function App() {
   };
 
   const [activeTab, setActiveTab] = useState('landing');
-  const [crops, setCrops] = useState(myCropsData);
+  const [crops, setCrops] = useState(() => {
+    try {
+      const saved = localStorage.getItem('kisansetu_crops');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return myCropsData;
+  });
+  const [isBackendConnected, setIsBackendConnected] = useState(false);
 
   // Modal States
   const [isAddCropOpen, setIsAddCropOpen] = useState(false);
@@ -72,6 +83,42 @@ function App() {
       setToastMessage(null);
     }, 4000);
   };
+
+  // Sync with backend on mount
+  useEffect(() => {
+    const syncBackend = async () => {
+      const health = await checkBackendHealth();
+      setIsBackendConnected(health.online);
+
+      const token = localStorage.getItem('kisansetu_token');
+      if (token && token !== 'undefined') {
+        const cropsRes = await cropsAPI.getMyCrops();
+        if (cropsRes.success && Array.isArray(cropsRes.data) && cropsRes.data.length > 0) {
+          const mappedCrops = cropsRes.data.map((c) => ({
+            id: c._id,
+            name: c.cropName,
+            variety: 'Desi Supreme',
+            quantity: `${c.quantity} ${c.unit || 'Quintal'}`,
+            qtyValue: c.quantity,
+            price: Number(c.expectedPrice).toLocaleString(),
+            grade: 'GRADE_A',
+            unit: `/ ${c.unit || 'Q'}`,
+            change: '+5.0%',
+            trend: 'up',
+            status: c.status?.toUpperCase() || 'LISTED',
+            image: c.cropName?.toLowerCase().includes('cotton')
+              ? 'https://images.unsplash.com/photo-1606787366850-de6330128bfc?w=400&auto=format&fit=crop&q=80'
+              : 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400&auto=format&fit=crop&q=80',
+            health: 'Good Health',
+            nextAction: 'Market rates are favorable. Produce lot is listed.'
+          }));
+          setCrops(mappedCrops);
+        }
+      }
+    };
+
+    syncBackend();
+  }, [isLoggedIn]);
 
   const handleLoginSuccess = (userData, token) => {
     const userToSet = { ...farmerProfile, ...userData };
@@ -101,9 +148,30 @@ function App() {
     setActiveTab(targetTab);
   };
 
-  const handleAddCrop = (newCrop) => {
-    setCrops([newCrop, ...crops]);
+  const handleAddCrop = async (newCrop) => {
+    const updated = [newCrop, ...crops];
+    setCrops(updated);
+    try {
+      localStorage.setItem('kisansetu_crops', JSON.stringify(updated));
+    } catch (e) {}
+    setActiveTab('my-crops');
     showToast(`🌾 ${newCrop.name} added to produce inventory!`);
+
+    // Async push to backend
+    try {
+      const cleanPrice = Number(String(newCrop.price).replace(/[^0-9.]/g, '')) || 2500;
+      await cropsAPI.create({
+        cropName: newCrop.name,
+        quantity: Number(newCrop.qtyValue) || 10,
+        unit: 'Quintal',
+        expectedPrice: cleanPrice,
+        location: currentUser.location || 'Rajkot, Gujarat',
+        harvestDate: newCrop.harvestDate || new Date().toISOString(),
+        description: `Listed by ${currentUser.name}`
+      });
+    } catch (err) {
+      console.warn('Could not save crop to backend, kept in local state.');
+    }
   };
 
   const handleSaveProfile = (updated) => {

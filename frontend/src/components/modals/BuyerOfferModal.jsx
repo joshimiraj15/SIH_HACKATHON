@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { X, ShieldCheck, Star, MapPin, Truck, CheckCircle2, Phone, MessageSquare } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { offersAPI } from '../../services/api';
 import '../../styles/Modals.css';
 
 const BuyerOfferModal = ({ buyer, onClose }) => {
@@ -10,13 +11,20 @@ const BuyerOfferModal = ({ buyer, onClose }) => {
 
   if (!buyer) return null;
 
-  const handleAcceptDeal = () => {
+  const handleAcceptDeal = async () => {
     setDealAccepted(true);
     try {
       confetti({
         particleCount: 70,
         spread: 70,
         origin: { y: 0.6 }
+      });
+      // Try pushing offer record to backend
+      await offersAPI.makeOffer({
+        buyerName: buyer.name,
+        offeredPrice: buyer.priceValue || 25,
+        quantity: Number(dealQuantity) || 300,
+        notes: `Accepted direct offer from ${buyer.name}`
       });
     } catch (e) {}
   };
