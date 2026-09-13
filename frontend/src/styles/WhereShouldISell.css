@@ -340,3 +340,225 @@
   color: #d1fae5;
   line-height: 1.4;
 }
+
+/* ══ RECOMMENDATIONS CONTAINER & CARDS ══ */
+.recommendations-container {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.recommendations-header-bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.rec-section-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #17251C;
+  letter-spacing: -0.02em;
+}
+
+.rec-section-sub {
+  font-size: 0.84rem;
+  color: #647067;
+}
+
+.results-count-badge {
+  font-size: 0.76rem;
+  font-weight: 700;
+  background: #ECFDF5;
+  color: #047857;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid #A7F3D0;
+}
+
+.recommendation-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .recommendation-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.recommendation-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: all 0.22s ease;
+}
+
+.recommendation-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+}
+
+.recommendation-card.is-best-option {
+  border: 2px solid #10B981;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F0FDF4 100%);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15);
+}
+
+.best-market-ribbon {
+  position: absolute;
+  top: -12px;
+  right: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(135deg, #10B981 0%, #047857 100%);
+  color: #FFFFFF;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 4px 14px;
+  border-radius: 999px;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.35);
+  letter-spacing: 0.05em;
+}
+
+.rec-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.rec-market-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #17251C;
+  line-height: 1.2;
+}
+
+.rec-distance-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: #647067;
+  margin-top: 4px;
+}
+
+.rec-score-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #ECFDF5;
+  border: 1px solid #BBF7D0;
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+
+.score-val {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #047857;
+  line-height: 1;
+}
+
+.score-lbl {
+  font-size: 0.62rem;
+  color: #647067;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.rec-demand-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.rec-reason-txt {
+  font-size: 0.78rem;
+  color: #647067;
+}
+
+.rec-financials-box {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  background: #F9FAF8;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+@media (max-width: 600px) {
+  .rec-financials-box {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.financial-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.financial-cell .fin-lbl {
+  font-size: 0.68rem;
+  color: #647067;
+  margin-bottom: 2px;
+}
+
+.financial-cell strong {
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.financial-cell .fin-sub {
+  font-size: 0.64rem;
+  color: #9CA3AF;
+  margin-top: 2px;
+}
+
+.highlight-net {
+  background: #ECFDF5;
+  border-radius: 8px;
+  padding: 4px 6px;
+  margin: -4px -6px;
+}
+
+.btn-choose-mandi {
+  width: 100%;
+  padding: 11px;
+  border-radius: 10px;
+  background: #F3F4F6;
+  border: 1px solid #CBD5E1;
+  color: #17251C;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.btn-choose-mandi:hover {
+  background: #E5E7EB;
+}
+
+.btn-choose-mandi.btn-best {
+  background: linear-gradient(135deg, #10B981 0%, #047857 100%);
+  border: none;
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-choose-mandi.btn-best:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4);
+}
+

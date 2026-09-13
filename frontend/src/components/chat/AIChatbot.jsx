@@ -7,39 +7,49 @@ import {
   Sparkles, 
   TrendingUp, 
   MapPin, 
-  DollarSign, 
-  Globe, 
   RotateCcw,
-  Sprout
+  Mic,
+  MicOff,
+  Volume2,
+  VolumeX,
+  Square,
+  Globe,
+  ArrowRight,
+  BrainCircuit,
+  MessageSquare
 } from 'lucide-react';
-import { translations } from '../../data/translations';
+import { chatAPI } from '../../services/api';
 import { askKisanGeminiAI } from '../../services/geminiService';
 import '../../styles/AIChatbot.css';
 
-const AIChatbot = ({ language, setLanguage, setActiveTab }) => {
-  const [isOpen, setIsOpen] = useState(false);
+
+const AIChatbot = ({ language = 'gu', setLanguage, setActiveTab, isFullPage = false }) => {
+  const [isOpen, setIsOpen] = useState(isFullPage);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  
-  const t = translations[language] || translations.en;
+  const [selectedLang, setSelectedLang] = useState(language || 'gu');
+  const [isListening, setIsListening] = useState(false);
+  const [voiceStatus, setVoiceStatus] = useState('idle'); // 'idle' | 'listening' | 'processing' | 'speaking'
+  const [isMuted, setIsMuted] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
-  const initialGreeting = {
-    en: "Namaste! I am your Kisan AI Sahayak powered by Google Gemini. Ask me about live mandi prices for Wheat, Tomato, Onion, Cotton or selling advice across Gujarat APMC yards.",
-    gu: "નમસ્તે! હું ગૂગલ જેમિની સંચાલિત તમારો કિસાન એઆઈ સહાયક છું. મને ઘઉં, ટામેટા, ડુંગળી, કપાસ કે મગફળીના આજના યાર્ડ ભાવો અથવા વેચાણ સલાહ વિશે પૂછો.",
-    hi: "नमस्ते! मैं गूगल जेमिनी द्वारा संचालित आपका किसान एआई सहायक हूँ। मुझसे गेहूं, टमाटर, प्याज, कपास या मूंगफली के आज के मंडी भाव या बेचने की सलाह पूछें।"
+  const initialGreetings = {
+    gu: "નમસ્તે! હું કિસાન એઆઈ સહાયક છું 🌾\n\nઆજે ટામેટા, ડુંગળી કે ઘઉંના ભાવ અને બજાર વિશે શું જાણવું છે?",
+    hi: "नमस्ते! मैं किसान एआई सहायक हूँ 🌾\n\nआज मंडी भाव, बाजार रुझान या बिक्री सलाह के बारे में पूछें।",
+    en: "Hello! I am Kisan AI Sahayak 🌾\n\nAsk me about today's market rates, 3-day ML price predictions, or best selling mandis!"
   };
 
   const [messages, setMessages] = useState([
     {
       id: 1,
       sender: 'bot',
-      text: initialGreeting[language] || initialGreeting.en,
-      source: 'gemini',
+      text: initialGreetings[selectedLang] || initialGreetings.gu,
       time: 'Just now'
     }
   ]);
 
   const messagesEndRef = useRef(null);
+  const recognitionRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -49,71 +59,109 @@ const AIChatbot = ({ language, setLanguage, setActiveTab }) => {
     scrollToBottom();
   }, [messages, isTyping, isOpen]);
 
-  // Quick suggestion questions
-  const quickQuestions = {
-    en: [
-      "Wheat price in Rajkot APMC?",
-      "Tomato live price & best mandi?",
-      "Cotton & Groundnut rates in Gujarat?",
-      "Should I sell now or wait 2 days?"
-    ],
-    gu: [
-      "રાજકોટ યાર્ડમાં ઘઉંનો આજનો ભાવ શું છે?",
-      "ટામેટાનો આજનો લાઈવ ભાવ અને શ્રેષ્ઠ યાર્ડ?",
-      "ગુજરાતમાં કપાસ અને મગફળીનો ભાવ?",
-      "માલ અત્યારે વેચવો કે 2 દિવસ રાહ જોવી?"
-    ],
-    hi: [
-      "राजकोट मंडी में गेहूं का आज का रेट क्या है?",
-      "टमाटर का ताजा भाव और सर्वोत्तम मंडी?",
-      "गुजरात में कपास और मूंगफली का भाव?",
-      "फसल अभी बेचें या 2 दिन रुकें?"
-    ]
+  // Speech Recognition Setup
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      const langMap = {
+        gu: 'gu-IN',
+        hi: 'hi-IN',
+        en: 'en-US'
+      };
+      recognition.lang = langMap[selectedLang] || 'gu-IN';
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        setVoiceStatus('listening');
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setInputMessage(transcript);
+        setVoiceStatus('processing');
+        handleSendMessage(transcript);
+      };
+
+      recognition.onerror = (event) => {
+        console.warn('Speech recognition error:', event.error);
+        setIsListening(false);
+        setVoiceStatus('idle');
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+        if (voiceStatus === 'listening') {
+          setVoiceStatus('idle');
+        }
+      };
+
+      recognitionRef.current = recognition;
+    }
+  }, [selectedLang]);
+
+  // Text-to-Speech Helper
+  const speakText = (text) => {
+    if (isMuted || !('speechSynthesis' in window)) return;
+
+    window.speechSynthesis.cancel(); // Stop any active speech
+
+    const cleanText = text.replace(/[*#_~]/g, '');
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+
+    const voiceLangMap = {
+      gu: 'gu-IN',
+      hi: 'hi-IN',
+      en: 'en-US'
+    };
+    utterance.lang = voiceLangMap[selectedLang] || 'gu-IN';
+    utterance.rate = 0.95;
+
+    utterance.onstart = () => {
+      setIsSpeaking(true);
+      setVoiceStatus('speaking');
+    };
+
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      setVoiceStatus('idle');
+    };
+
+    utterance.onerror = () => {
+      setIsSpeaking(false);
+      setVoiceStatus('idle');
+    };
+
+    window.speechSynthesis.speak(utterance);
   };
 
-  const currentQuestions = quickQuestions[language] || quickQuestions.en;
-
-  // Local fallback price engine (used if offline or network throttled)
-  const getLocalCropResponse = (query, lang) => {
-    const q = query.toLowerCase();
-    let crop = 'Wheat';
-    let rate = 2610;
-    let trend = '+8.4%';
-    let outlook = 'Bullish';
-
-    if (q.includes('tomato') || q.includes('ટામેટા') || q.includes('ટમેટા') || q.includes('टमाटर')) {
-      crop = 'Tomato (ટામેટા / टमाटर)';
-      rate = 2650;
-      trend = '+8.2%';
-      outlook = 'High Demand';
-    } else if (q.includes('onion') || q.includes('ડુંગળી') || q.includes('प्याज')) {
-      crop = 'Onion (ડુંગળી / प्याज)';
-      rate = 2420;
-      trend = '-4.1%';
-      outlook = 'Hold for next week';
-    } else if (q.includes('potato') || q.includes('બટાકા') || q.includes('આલૂ') || q.includes('आलू')) {
-      crop = 'Potato (બટાકા / आलू)';
-      rate = 2310;
-      trend = '+3.7%';
-      outlook = 'Steady Demand';
-    } else if (q.includes('cotton') || q.includes('કપાસ') || q.includes('कपास')) {
-      crop = 'Cotton (કપાસ / कपास)';
-      rate = 6850;
-      trend = '+4.2%';
-      outlook = 'Export Demand High';
-    } else if (q.includes('groundnut') || q.includes('મગફળી') || q.includes('मूंगफली')) {
-      crop = 'Groundnut (મગફળી / मूंगफली)';
-      rate = 6200;
-      trend = '+5.1%';
-      outlook = 'Oil Mills Buying';
+  const stopSpeaking = () => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      setVoiceStatus('idle');
     }
+  };
 
-    if (lang === 'gu') {
-      return `🌾 **${crop} નો આજનો લાઈવ બજાર ભાવ:**\n\n• **રાજકોટ યાર્ડ (શ્રેષ્ઠ ભાવ):** ₹${rate} / ક્વિન્ટલ (${trend})\n• **અમદાવાદ APMC:** ₹${rate - 80} / ક્વિન્ટલ\n• **સુરત APMC:** ₹${rate - 320} / ક્વિન્ટલ\n\n💡 **કિસાન સલાહ:** બજાર આઉટલુક **${outlook}** છે. કિસાનસેતુ ડાયરેક્ટ બાયર્સને વેચવાથી તમને ટ્રાન્સપોર્ટ બચત સાથે વધુ નફો થશે!`;
-    } else if (lang === 'hi') {
-      return `🌾 **${crop} का आज का ताजा मंडी भाव:**\n\n• **राजकोट मंडी (सर्वोत्तम रेट):** ₹${rate} / क्विंटल (${trend})\n• **अहमदाबाद APMC:** ₹${rate - 80} / क्विंटल\n• **सूरत APMC:** ₹${rate - 320} / क्विंटल\n\n💡 **किसान सलाह:** बाजार का रुख **${outlook}** है। किसानसेतु डायरेक्ट बॉयर्स को बेचकर आप बिना आढ़त अधिक मुनाफा कमा सकते हैं!`;
+  const toggleMic = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      setVoiceStatus('idle');
     } else {
-      return `🌾 **Current Live Market Rate for ${crop}:**\n\n• **Rajkot APMC (Top Rate):** ₹${rate} / Quintal (${trend})\n• **Ahmedabad APMC:** ₹${rate - 80} / Quintal\n• **Surat APMC:** ₹${rate - 320} / Quintal\n\n💡 **Advisory:** Market sentiment is **${outlook}**. You can lock direct farmgate pickup with zero commission on KisanSetu!`;
+      if (!recognitionRef.current) {
+        alert('Voice speech recognition is not supported in this browser. Please use Google Chrome.');
+        return;
+      }
+      try {
+        stopSpeaking();
+        recognitionRef.current.start();
+      } catch (err) {
+        console.warn('Mic start error:', err);
+      }
     }
   };
 
@@ -131,201 +179,305 @@ const AIChatbot = ({ language, setLanguage, setActiveTab }) => {
     setMessages((prev) => [...prev, userMsg]);
     setInputMessage('');
     setIsTyping(true);
+    setVoiceStatus('processing');
 
     try {
-      // Connect to Google Gemini API (AQ.Ab8RN6LGuOcs5QBMpEejJSrFKZyjZiyxdnCuqfe2sv35cbp8Zg)
-      const geminiReply = await askKisanGeminiAI(text, language, messages);
+      let botAnswer = null;
 
-      if (geminiReply && geminiReply.trim()) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: Date.now() + 1,
-            sender: 'bot',
-            text: geminiReply.trim(),
-            source: 'gemini',
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          }
-        ]);
-      } else {
-        // Fallback to local intelligent crop response
-        const fallbackText = getLocalCropResponse(text, language);
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: Date.now() + 1,
-            sender: 'bot',
-            text: fallbackText,
-            source: 'local',
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          }
-        ]);
+      try {
+        const res = await chatAPI.ask(text, selectedLang);
+        if (res && res.success && res.source !== 'Offline RAG Fallback') {
+          botAnswer = res.answer;
+        }
+      } catch (e) {
+        console.warn('Backend chat API failed, calling direct Gemini API with key:', e.message);
       }
-    } catch (err) {
-      console.warn("Kisan AI Assistant error:", err);
-      const fallbackText = getLocalCropResponse(text, language);
+
+      if (!botAnswer) {
+        const directGemini = await askKisanGeminiAI(text, selectedLang, messages);
+        if (directGemini) {
+          botAnswer = directGemini;
+        }
+      }
+
+      if (!botAnswer) {
+        botAnswer = selectedLang === 'gu'
+          ? 'નમસ્તે! હું કિસાન એઆઈ સહાયક છું. આજના APMC માર્કેટ રેટ અને 3-દિવસીય ભાવ પ્રિડિક્શન જાણવા માર્કેટ લિસ્ટ જુઓ.'
+          : selectedLang === 'hi'
+          ? 'नमस्ते! मैं किसान एआई सहायक हूँ। आज के मंडी भाव और 3-दिवसीय पूर्वानुमान जानने के लिए मार्केट लिस्ट देखें।'
+          : "Hello! I am Kisan AI Sahayak. Today's market rates are available in the Market Prices tab.";
+      }
+
       setMessages((prev) => [
         ...prev,
         {
           id: Date.now() + 1,
           sender: 'bot',
-          text: fallbackText,
-          source: 'local',
+          text: botAnswer,
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
       ]);
+
+      // Automatically speak answer if not muted
+      if (!isMuted) {
+        speakText(botAnswer);
+      } else {
+        setVoiceStatus('idle');
+      }
+    } catch (err) {
+      const fallbackMsg = selectedLang === 'gu'
+        ? 'કિસાન એઆઈ માર્કેટ સપોર્ટ સેવા સક્રિય છે. તાજેતરના ભાવ જોવા માટે માર્કેટ પ્રાઈસ ટેબ ચકાસો.'
+        : 'Kisan AI Market Advisory Service is active. Check Market Prices tab for live rates.';
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now() + 1,
+          sender: 'bot',
+          text: fallbackMsg,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }
+      ]);
+      setVoiceStatus('idle');
     } finally {
       setIsTyping(false);
     }
+
   };
 
-  const handleResetChat = () => {
-    setMessages([
-      {
-        id: Date.now(),
-        sender: 'bot',
-        text: initialGreeting[language] || initialGreeting.en,
-        source: 'gemini',
-        time: 'Just now'
-      }
-    ]);
+  const quickQuestions = [
+    { gu: "આજે ટામેટાના ભાવ કેટલા છે?", hi: "आज टमाटर का भाव क्या है?", en: "Today's market price" },
+    { gu: "મારા પાક માટે કયું માર્કેટ શ્રેષ્ઠ છે?", hi: "मेरी फसल के लिए कौन सी मंडी सबसे अच्छी है?", en: "Best market for my crop" },
+    { gu: "ડુંગળીના ભાવનું પ્રિડિક્શન બતાવો", hi: "प्याज के मूल्य का पूर्वानुमान बताएं", en: "Predict my crop price" },
+    { gu: "શું આજે પાક વેચવો જોઈએ?", hi: "क्या मुझे आज फसल बेचनी चाहिए?", en: "Should I sell today?" },
+    { gu: "ખરીદદારો (Buyers) શોધો", hi: "खरीदार खोजें", en: "Find buyers" }
+  ];
+
+  const voiceStatusBadges = {
+    idle: { label: '🎤 Tap to Speak', color: '#10b981', bg: '#ecfdf5' },
+    listening: { label: '🔴 Listening...', color: '#ef4444', bg: '#fef2f2' },
+    processing: { label: '📝 Processing AI...', color: '#f59e0b', bg: '#fffbeb' },
+    speaking: { label: '🔊 AI Speaking Answer...', color: '#3b82f6', bg: '#eff6ff' }
   };
 
-  // Helper to render markdown bolding cleanly
-  const renderFormattedText = (rawText) => {
-    if (!rawText) return '';
-    const parts = rawText.split(/(\*\*.*?\*\*)/g);
-    return parts.map((part, i) => {
-      if (part.startsWith('**') && part.endsWith('**')) {
-        return <strong key={i}>{part.slice(2, -2)}</strong>;
-      }
-      return part;
-    });
-  };
-
-  return (
-    <>
-      {/* Floating Trigger Button */}
-      <div className="ai-chatbot-launcher">
-        <button 
-          className="ai-launcher-btn"
-          onClick={() => setIsOpen(!isOpen)}
-          title="Kisan AI Sahayak - Live Crop Rates"
-        >
-          <div className="ai-icon-pulse">
-            <Sparkles size={16} />
+  const renderContent = () => (
+    <div className={`krishi-assistant-wrapper ${isFullPage ? 'full-page' : 'widget-mode'}`}>
+      {/* Voice Bar & Language Selector Header */}
+      <div className="krishi-assistant-header" style={{ padding: '14px 18px', background: '#ffffff', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', display: 'flex', alignItems: 'center', justifyCenter: 'center', color: '#fff', fontWeight: '800', fontSize: '1.2rem', textAlign: 'center', lineHeight: '40px' }}>
+            🌾
           </div>
-          <span>{isOpen ? (language === 'gu' ? 'બંધ કરો' : language === 'hi' ? 'बंद करें' : 'Close AI') : t.aiAssistant}</span>
-        </button>
+          <div>
+            <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: '800', color: '#17251c', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              Kisan AI Voice Assistant
+              <span style={{ fontSize: '0.72rem', background: '#ecfdf5', color: '#047857', border: '1px solid #a7f3d0', padding: '1px 7px', borderRadius: '99px', fontWeight: '700' }}>Live RAG</span>
+            </h3>
+            <p style={{ margin: 0, fontSize: '0.78rem', color: '#6b7280' }}>Multilingual Voice AI & APMC Price Discovery</p>
+          </div>
+        </div>
+
+        {/* Language Selector Chips */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#4b5563', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Globe size={14} color="#10b981" /> Language:
+          </span>
+          {['gu', 'hi', 'en'].map((langKey) => (
+            <button
+              key={langKey}
+              type="button"
+              className={`zen-cat-pill ${selectedLang === langKey ? 'active' : ''}`}
+              onClick={() => {
+                setSelectedLang(langKey);
+                if (setLanguage) setLanguage(langKey);
+              }}
+              style={{ fontSize: '0.78rem', padding: '4px 10px' }}
+            >
+              {langKey === 'gu' ? 'ગુજરાતી' : langKey === 'hi' ? 'हिन्दी' : 'English'}
+            </button>
+          ))}
+          {!isFullPage && (
+            <button className="krishi-tool-btn" onClick={() => setIsOpen(false)}>
+              <X size={16} />
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Floating Chat Drawer Window */}
-      {isOpen && (
-        <div className="ai-chat-window">
-          {/* Chat Header */}
-          <div className="ai-chat-header">
-            <div className="ai-header-left">
-              <div className="ai-avatar-header">
-                🤖
+      {/* Dynamic Voice Status Badge & Audio Controls */}
+      <div style={{ padding: '10px 18px', background: voiceStatusBadges[voiceStatus].bg, borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span style={{ fontSize: '0.82rem', fontWeight: '800', color: voiceStatusBadges[voiceStatus].color, display: 'flex', alignItems: 'center', gap: '6px' }}>
+          {voiceStatusBadges[voiceStatus].label}
+        </span>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {isSpeaking && (
+            <button
+              type="button"
+              onClick={stopSpeaking}
+              style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '4px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+            >
+              <Square size={12} /> Stop
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={() => {
+              setIsMuted(!isMuted);
+              if (!isMuted) stopSpeaking();
+            }}
+            style={{ background: isMuted ? '#fee2e2' : '#e0f2fe', color: isMuted ? '#ef4444' : '#0284c7', border: 'none', padding: '4px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+          >
+            {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
+            {isMuted ? 'Muted' : 'Sound On'}
+          </button>
+        </div>
+      </div>
+
+      {/* Suggested Quick Questions Rail */}
+      <div className="krishi-suggestions-rail" style={{ padding: '8px 18px', background: '#fafbfa', borderBottom: '1px solid #f3f4f6', overflowX: 'auto', display: 'flex', gap: '8px' }}>
+        {quickQuestions.map((qObj, idx) => {
+          const qText = qObj[selectedLang] || qObj.gu;
+          return (
+            <button
+              key={idx}
+              className="krishi-pill-chip"
+              onClick={() => handleSendMessage(qText)}
+              disabled={isTyping}
+              style={{ whiteSpace: 'nowrap', fontSize: '0.78rem' }}
+            >
+              {qText}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Messages Scroll Body */}
+      <div className="krishi-messages-box" style={{ padding: '16px 18px', minHeight: isFullPage ? '380px' : '260px', maxHeight: isFullPage ? '500px' : '320px', overflowY: 'auto' }}>
+        {messages.map((m) => (
+          <div key={m.id} className={`krishi-bubble-row ${m.sender}`}>
+            <div className="krishi-bubble">
+              <div className="krishi-text-content" style={{ whiteSpace: 'pre-wrap', lineHeight: '1.5' }}>
+                {m.text}
               </div>
-              <div className="ai-header-title">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <h3>{t.aiAssistant}</h3>
-                  <span className="gemini-pill-badge">✨ Gemini AI</span>
-                </div>
-                <p>● Live Mandi & Crop Advisor</p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px', fontSize: '0.72rem', opacity: 0.8 }}>
+                <span>{m.time}</span>
+                {m.sender === 'bot' && (
+                  <button 
+                    type="button" 
+                    onClick={() => speakText(m.text)}
+                    style={{ background: 'none', border: 'none', color: '#047857', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '2px', fontWeight: '700' }}
+                  >
+                    <Volume2 size={12} /> Speak
+                  </button>
+                )}
               </div>
             </div>
+          </div>
+        ))}
 
-            <div className="ai-header-actions">
-              {/* Reset Chat */}
-              <button 
-                className="ai-tool-btn" 
-                onClick={handleResetChat}
-                title="Clear Chat / નવો વાર્તાલાપ"
-              >
-                <RotateCcw size={13} />
-              </button>
-
-              {/* Language Switcher inside Chat */}
-              <button 
-                className="ai-lang-toggle-btn"
-                onClick={() => {
-                  const nextLang = language === 'en' ? 'gu' : language === 'gu' ? 'hi' : 'en';
-                  setLanguage(nextLang);
-                }}
-                title="Change AI Chat Language"
-              >
-                {language.toUpperCase()}
-              </button>
-
-              <button className="ai-close-btn" onClick={() => setIsOpen(false)}>
-                <X size={18} />
-              </button>
+        {isTyping && (
+          <div className="krishi-bubble-row bot">
+            <div className="krishi-typing-indicator">
+              <Sparkles size={14} className="krishi-spin" />
+              <span>Analyzing live Mandi database & ML models...</span>
             </div>
           </div>
+        )}
 
-          {/* Quick Query Pills */}
-          <div className="ai-quick-chips-bar">
-            {currentQuestions.map((q, idx) => (
-              <button 
-                key={idx} 
-                className="ai-chip-pill"
-                onClick={() => handleSendMessage(q)}
-                disabled={isTyping}
-              >
-                {q}
-              </button>
-            ))}
-          </div>
+        <div ref={messagesEndRef} />
+      </div>
 
-          {/* Messages Scroll Area */}
-          <div className="ai-messages-scroll">
-            {messages.map((m) => (
-              <div key={m.id} className={`chat-bubble ${m.sender}`}>
-                <div className="chat-bubble-content">
-                  {renderFormattedText(m.text)}
-                </div>
-                <div className="bubble-meta">
-                  {m.sender === 'bot' && (
-                    <span className="source-tag">
-                      {m.source === 'gemini' ? '✨ Gemini 3.5' : '🌾 APMC Engine'}
-                    </span>
-                  )}
-                  <span className="bubble-time">{m.time}</span>
-                </div>
-              </div>
-            ))}
+      {/* Large Microphone & Input Footer */}
+      <div style={{ padding: '14px 18px', background: '#ffffff', borderTop: '1px solid #e5e7eb' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* Large Primary Mic Button (Section 10 Requirement) */}
+          <button
+            type="button"
+            onClick={toggleMic}
+            style={{
+              width: '52px',
+              height: '52px',
+              borderRadius: '50%',
+              background: isListening ? '#ef4444' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              color: '#ffffff',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              boxShadow: isListening ? '0 0 16px rgba(239, 68, 68, 0.6)' : '0 4px 12px rgba(16, 185, 129, 0.3)',
+              transition: 'all 0.2s ease',
+              flexShrink: 0
+            }}
+            title={isListening ? 'Stop Listening' : 'Tap to Speak'}
+          >
+            {isListening ? <MicOff size={24} /> : <Mic size={24} />}
+          </button>
 
-            {isTyping && (
-              <div className="chat-bubble bot" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#15803d', fontStyle: 'italic', fontSize: '0.8rem' }}>
-                <Sparkles size={14} className="spin" /> 
-                {language === 'gu' ? 'કિસાન એઆઈ જેમિની વિચારી રહ્યું છે...' : language === 'hi' ? 'किसान एआई जेमिनी विश्लेषण कर रहा है...' : 'Gemini AI is analyzing live APMC insights...'}
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Input Footer */}
+          {/* Text Input Form */}
           <form 
-            className="ai-input-footer"
             onSubmit={(e) => {
               e.preventDefault();
               handleSendMessage();
             }}
+            style={{ flex: 1, display: 'flex', gap: '8px' }}
           >
             <input 
-              type="text" 
-              placeholder={t.typeQuestion} 
+              type="text"
+              placeholder={
+                isListening 
+                  ? "Listening to speech..." 
+                  : selectedLang === 'gu' ? "પ્રશ્ન પૂછો (જેમ કે: આજે ટામેટાના ભાવ કેટલા છે?)" : selectedLang === 'hi' ? "सवाल पूछें (जैसे: आज टमाटर का भाव क्या है?)" : "Ask a question..."
+              }
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              className="ai-text-input"
-              disabled={isTyping}
+              className="krishi-text-box"
+              disabled={isTyping || isListening}
+              style={{ flex: 1, padding: '12px 14px', borderRadius: '10px', border: '1.5px solid #d1d5db', fontSize: '0.9rem' }}
             />
-            <button type="submit" className="ai-send-btn" disabled={!inputMessage.trim() || isTyping}>
-              <Send size={15} />
+
+            <button 
+              type="submit" 
+              className="krishi-send-submit"
+              disabled={!inputMessage.trim() || isTyping}
+              style={{ padding: '0 18px', borderRadius: '10px', background: '#10b981', color: '#fff', border: 'none', fontWeight: '700' }}
+            >
+              <Send size={18} />
             </button>
           </form>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (isFullPage) {
+    return renderContent();
+  }
+
+  return (
+    <>
+      <div className="krishi-ai-floating-trigger">
+        <button 
+          className="krishi-ai-circle-btn"
+          onClick={() => setIsOpen(!isOpen)}
+          aria-label="Open Voice AI Assistant"
+          title="Voice AI Assistant"
+        >
+          {isOpen ? (
+            <X size={26} color="#ffffff" />
+          ) : (
+            <div className="krishi-circle-inner">
+              <Mic size={26} color="#ffffff" />
+              <span className="krishi-sparkle-dot">✨</span>
+            </div>
+          )}
+        </button>
+      </div>
+
+      {isOpen && (
+        <div className="krishi-chat-modal" style={{ maxWidth: '480px', width: '92vw' }}>
+          {renderContent()}
         </div>
       )}
     </>

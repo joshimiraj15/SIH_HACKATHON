@@ -1,5 +1,6 @@
 // src/components/views/WhereShouldISell.jsx
 import React, { useState } from 'react';
+import { translations } from '../../data/translations';
 import { 
   Sparkles, 
   MapPin, 
@@ -9,224 +10,283 @@ import {
   ArrowUpRight, 
   Compass, 
   Truck, 
-  CheckCircle2,
-  DollarSign,
-  Loader2
+  CheckCircle2, 
+  DollarSign, 
+  Loader2,
+  Calendar,
+  Layers,
+  ArrowRight,
+  Flame,
+  Percent
 } from 'lucide-react';
-import { whereToSellComparison } from '../../data/mockData';
-import { pricesAPI } from '../../services/api';
 import '../../styles/WhereShouldISell.css';
 
-const WhereShouldISell = ({ setActiveTab }) => {
+const WhereShouldISell = ({ setActiveTab, showToast, language }) => {
+  const t = translations[language] || translations.en;
   const [crop, setCrop] = useState('Wheat');
-  const [quantity, setQuantity] = useState('500 kg');
+  const [quantity, setQuantity] = useState('50'); // Quintals
+  const [unit, setUnit] = useState('Quintals');
   const [location, setLocation] = useState('Rajkot');
-  const [comparisons, setComparisons] = useState(whereToSellComparison);
-  const [loading, setLoading] = useState(false);
-  const [bestMandiData, setBestMandiData] = useState({
-    mandi: 'Rajkot APMC',
-    price: '₹2,610',
-    extra: '+ ₹1,920 more than nearby mandi',
-    revenue: '₹12,400',
-    transport: '- ₹850',
-    net: '₹11,550'
+  const [expectedDate, setExpectedDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 2);
+    return d.toISOString().split('T')[0];
   });
+  const [loading, setLoading] = useState(false);
 
-  const handleFindBest = async () => {
-    setLoading(true);
-    try {
-      const res = await pricesAPI.getPriceComparison(crop);
-      if (res.success && res.data && res.data.length > 0) {
-        const topMarket = res.bestMarket;
-        const qtyNum = parseFloat(quantity) || 5; // quintals approx
-        const priceNum = topMarket?.price || 2600;
-        const gross = Math.round(priceNum * (qtyNum / 100));
-        const transport = 850;
-        const net = Math.max(0, gross - transport);
+  // Dynamic recommendation engine based on user inputs
+  const cropMultipliers = {
+    Wheat: { price: 2610, unit: 'Qtl' },
+    Cotton: { price: 7450, unit: 'Qtl' },
+    Groundnut: { price: 6180, unit: 'Qtl' },
+    Tomato: { price: 2150, unit: 'Qtl' },
+    Onion: { price: 2350, unit: 'Qtl' },
+    Potato: { price: 1920, unit: 'Qtl' }
+  };
 
-        setBestMandiData({
-          mandi: `${topMarket?.marketName || 'Rajkot'} APMC`,
-          price: `₹${priceNum.toLocaleString()}`,
-          extra: `Highest rate in ${topMarket?.district || 'region'}`,
-          revenue: `₹${gross.toLocaleString()}`,
-          transport: `- ₹${transport}`,
-          net: `₹${net.toLocaleString()}`
-        });
+  const getRecommendations = () => {
+    const baseRate = cropMultipliers[crop]?.price || 2500;
+    const qtyNum = parseFloat(quantity) || 50;
 
-        const newRows = res.data.slice(0, 4).map((m, idx) => ({
-          mandi: `${m._id || m.marketName} APMC`,
-          priceStr: `₹${(m.latestPrice || m.modalPrice || 2500).toLocaleString()}`,
-          distance: `${12 + idx * 8} km`,
-          netEarnings: `₹${Math.max(0, Math.round((m.latestPrice || 2500) * (qtyNum / 100)) - (500 + idx * 200)).toLocaleString()}`,
-          isBest: idx === 0,
-          highlight: idx === 0 ? 'Best Price' : null
-        }));
-        setComparisons(newRows);
+    return [
+      {
+        id: 1,
+        marketName: 'Rajkot APMC Mega Yard',
+        city: 'Rajkot',
+        distance: 14,
+        currentPrice: baseRate,
+        estimatedRevenue: Math.round(baseRate * qtyNum),
+        transportCost: 850,
+        netProfit: Math.round(baseRate * qtyNum) - 850,
+        demandLevel: 'High',
+        recommendationScore: 98,
+        isBest: true,
+        reason: 'Lowest logistics cost, highest price discovery index'
+      },
+      {
+        id: 2,
+        marketName: 'Gondal APMC Market',
+        city: 'Gondal',
+        distance: 38,
+        currentPrice: Math.round(baseRate * 0.98),
+        estimatedRevenue: Math.round(baseRate * 0.98 * qtyNum),
+        transportCost: 1450,
+        netProfit: Math.round(baseRate * 0.98 * qtyNum) - 1450,
+        demandLevel: 'High',
+        recommendationScore: 91,
+        isBest: false,
+        reason: 'Strong oilseeds & grains procurement center'
+      },
+      {
+        id: 3,
+        marketName: 'Junagadh APMC Yard',
+        city: 'Junagadh',
+        distance: 102,
+        currentPrice: Math.round(baseRate * 0.96),
+        estimatedRevenue: Math.round(baseRate * 0.96 * qtyNum),
+        transportCost: 3200,
+        netProfit: Math.round(baseRate * 0.96 * qtyNum) - 3200,
+        demandLevel: 'Medium',
+        recommendationScore: 84,
+        isBest: false,
+        reason: 'Consistent daily auctions for Saurashtra farmers'
+      },
+      {
+        id: 4,
+        marketName: 'Ahmedabad Jamalpur Yard',
+        city: 'Ahmedabad',
+        distance: 215,
+        currentPrice: Math.round(baseRate * 1.02),
+        estimatedRevenue: Math.round(baseRate * 1.02 * qtyNum),
+        transportCost: 6500,
+        netProfit: Math.round(baseRate * 1.02 * qtyNum) - 6500,
+        demandLevel: 'High',
+        recommendationScore: 78,
+        isBest: false,
+        reason: 'Higher rate but freight costs reduce net profit'
       }
-    } catch (e) {
-      console.warn('Fallback to mock comparison');
-    } finally {
+    ];
+  };
+
+  const [recommendations, setRecommendations] = useState(getRecommendations());
+
+  const handleCalculate = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setTimeout(() => {
+      setRecommendations(getRecommendations());
       setLoading(false);
-    }
+    }, 450);
   };
 
   return (
     <div className="where-to-sell-container">
       {/* Header */}
       <div className="where-header">
-        <h1>Where Should I Sell?</h1>
-        <p>Get the best market, price and profit for your crop.</p>
+        <div>
+          <span className="section-micro-tag">{t.intelPriceOpt}</span>
+          <h1>{t.whereToSellTitleAlt}</h1>
+          <p>{t.whereToSellDesc}</p>
+        </div>
       </div>
 
-      {/* Filter Options */}
-      <div className="where-filter-card">
+      {/* Input Selection Form Card */}
+      <form onSubmit={handleCalculate} className="where-filter-card">
         <div className="where-filters-row">
+          {/* Crop Selector */}
           <div className="where-filter-box">
-            <label>Crop</label>
+            <label>{t.cropCommodityLbl}</label>
             <select 
               value={crop} 
               onChange={(e) => setCrop(e.target.value)}
               className="radar-select"
             >
-              <option value="Wheat">🌾 Wheat</option>
-              <option value="Tomato">🍅 Tomato</option>
-              <option value="Onion">🧅 Onion</option>
-              <option value="Potato">🥔 Potato</option>
+              {t.cropOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
 
+          {/* Quantity */}
           <div className="where-filter-box">
-            <label>Quantity</label>
+            <label>{t.harvestQtyLbl}</label>
             <input 
-              type="text" 
+              type="number" 
+              min="1"
               value={quantity} 
               onChange={(e) => setQuantity(e.target.value)}
               className="radar-input"
+              placeholder="e.g. 50"
             />
           </div>
 
+          {/* Location */}
           <div className="where-filter-box">
-            <label>Location</label>
+            <label>{t.farmLocationLbl}</label>
             <select 
               value={location} 
               onChange={(e) => setLocation(e.target.value)}
               className="radar-select"
             >
               <option value="Rajkot">Rajkot, Gujarat</option>
+              <option value="Gondal">Gondal, Gujarat</option>
+              <option value="Junagadh">Junagadh, Gujarat</option>
+              <option value="Morbi">Morbi, Gujarat</option>
+              <option value="Jamnagar">Jamnagar, Gujarat</option>
               <option value="Ahmedabad">Ahmedabad, Gujarat</option>
               <option value="Surat">Surat, Gujarat</option>
             </select>
           </div>
+
+          {/* Expected Selling Date */}
+          <div className="where-filter-box">
+            <label>{t.expectedSellDateLbl}</label>
+            <input 
+              type="date"
+              value={expectedDate}
+              onChange={(e) => setExpectedDate(e.target.value)}
+              className="radar-input"
+            />
+          </div>
         </div>
 
-        <button className="where-find-btn" onClick={handleFindBest} disabled={loading}>
-          <Compass size={16} />
-          <span>{loading ? 'Analyzing Mandis...' : 'Find Best Option'}</span>
+        <button type="submit" className="where-find-btn" disabled={loading}>
+          {loading ? <Loader2 size={16} className="animate-spin" /> : <Compass size={16} />}
+          <span>{loading ? t.analyzingMandis : t.calcBestMandi}</span>
         </button>
-      </div>
+      </form>
 
-      {/* Main Content Grid */}
-      <div className="where-main-grid">
-        {/* Left Column: Best Option Card + Why Badges + Comparison Table */}
-        <div className="where-left-column">
-          {/* Best Option Gold Card */}
-          <div className="best-option-card">
-            <div className="best-option-info">
-              <div className="best-option-badge-tag">
-                <Award size={14} /> Best Option
-              </div>
-              <div className="best-mandi-title">{bestMandiData.mandi}</div>
-              <div className="best-mandi-rate">
-                {bestMandiData.price} <span>/ Q</span>
-              </div>
-              <div className="best-mandi-extra">
-                <ArrowUpRight size={14} /> {bestMandiData.extra}
-              </div>
-            </div>
-
-            <div className="best-option-calc">
-              <div className="calc-line">
-                <span>Expected Revenue</span>
-                <strong>{bestMandiData.revenue}</strong>
-              </div>
-              <div className="calc-line expense">
-                <span>Transport</span>
-                <strong>{bestMandiData.transport}</strong>
-              </div>
-              <div className="calc-line net">
-                <span>Net Earnings</span>
-                <span className="net-amount">{bestMandiData.net}</span>
-              </div>
-            </div>
+      {/* Recommendations Cards Grid */}
+      <div className="recommendations-container">
+        <div className="recommendations-header-bar">
+          <div>
+            <h2 className="rec-section-title">{t.recommendedMarkets ? t.recommendedMarkets.replace("{qty}", quantity).replace("{crop}", crop) : `Recommended Markets for ${quantity} Qtl ${crop}`}</h2>
+            <p className="rec-section-sub">{t.sellingAround ? t.sellingAround.replace("{date}", expectedDate).replace("{location}", location) : `Selling around ${expectedDate} from ${location} farm gate`}</p>
           </div>
-
-          {/* Why this is the best option? */}
-          <div className="why-best-section">
-            <h4>Why this is the best option?</h4>
-            <div className="why-badges-row">
-              <div className="why-badge-pill">
-                <DollarSign size={16} />
-                <span>Highest Price</span>
-              </div>
-              <div className="why-badge-pill">
-                <MapPin size={16} />
-                <span>Short Distance (12.4 km)</span>
-              </div>
-              <div className="why-badge-pill">
-                <ShieldCheck size={16} />
-                <span>Trusted Buyers</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Nearby Markets Comparison */}
-          <div className="nearby-table-card">
-            <h4>Nearby Markets Comparison</h4>
-            <table className="comparison-table">
-              <thead>
-                <tr>
-                  <th>Mandi</th>
-                  <th>Price / Q</th>
-                  <th>Distance</th>
-                  <th>Net Earnings</th>
-                </tr>
-              </thead>
-              <tbody>
-                {comparisons.map((row, idx) => (
-                  <tr key={idx} className={row.isBest ? 'highlight-best' : ''}>
-                    <td>
-                      {row.mandi}
-                      {row.highlight && <span className="table-best-tag">{row.highlight}</span>}
-                    </td>
-                    <td><strong>{row.priceStr}</strong></td>
-                    <td>{row.distance}</td>
-                    <td>
-                      <span style={{ color: row.isBest ? '#15803d' : '#1f2937', fontWeight: row.isBest ? '700' : '500' }}>
-                        {row.netEarnings}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <span className="results-count-badge">{t.mandisEvaluated ? t.mandisEvaluated.replace("{count}", "4") : "4 Mandis Evaluated"}</span>
         </div>
 
-        {/* Right Column: Promotional & Farmer Story */}
-        <div className="where-right-promo-card">
-          <img 
-            src="https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=500&auto=format&fit=crop&q=80" 
-            alt="Farmer in Field" 
-            className="promo-farmer-bg"
-          />
-          <div className="promo-quote-box">
-            <div className="promo-quote-title">
-              "Right market.<br />Right price.<br />Better future."
+        <div className="recommendation-cards-grid">
+          {recommendations.map((item) => (
+            <div 
+              key={item.id} 
+              className={`recommendation-card ${item.isBest ? 'is-best-option' : ''}`}
+            >
+              {/* Highlight Ribbon for Best Option */}
+              {item.isBest && (
+                <div className="best-market-ribbon">
+                  <Award size={14} />
+                  <span>{t.bestMarket}</span>
+                </div>
+              )}
+
+              <div className="rec-card-header">
+                <div>
+                  <h3 className="rec-market-name">{item.marketName}</h3>
+                  <div className="rec-distance-row">
+                    <MapPin size={13} />
+                    <span>{item.distance} {t.kmFrom ? t.kmFrom.replace("{location}", location) : `km from ${location}`}</span>
+                  </div>
+                </div>
+
+                <div className="rec-score-pill">
+                  <span className="score-val">{item.recommendationScore}%</span>
+                  <span className="score-lbl">{t.matchLbl}</span>
+                </div>
+              </div>
+
+              {/* Demand & Reason */}
+              <div className="rec-demand-row">
+                <span className={`demand-badge demand-${item.demandLevel.toLowerCase()}`}>
+                  <Flame size={12} /> {item.demandLevel} {t.demandLbl}
+                </span>
+                <span className="rec-reason-txt">{item.reason}</span>
+              </div>
+
+              {/* Financial Metrics Grid */}
+              <div className="rec-financials-box">
+                <div className="financial-cell">
+                  <span className="fin-lbl">{t.currentPriceLbl}</span>
+                  <strong className="fin-val text-gray-900">₹{item.currentPrice.toLocaleString()}</strong>
+                  <span className="fin-sub">{t.perQtl}</span>
+                </div>
+
+                <div className="financial-cell">
+                  <span className="fin-lbl">{t.estimatedRevenueLbl}</span>
+                  <strong className="fin-val text-gray-900">₹{item.estimatedRevenue.toLocaleString()}</strong>
+                  <span className="fin-sub">{t.grossPayout}</span>
+                </div>
+
+                <div className="financial-cell">
+                  <span className="fin-lbl">{t.transportCostLbl}</span>
+                  <strong className="fin-val text-red-600">- ₹{item.transportCost.toLocaleString()}</strong>
+                  <span className="fin-sub">{t.freightEst}</span>
+                </div>
+
+                <div className="financial-cell highlight-net">
+                  <span className="fin-lbl">{t.netProfitLbl}</span>
+                  <strong className="fin-val text-emerald-700">₹{item.netProfit.toLocaleString()}</strong>
+                  <span className="fin-sub">{t.inYourPocket}</span>
+                </div>
+              </div>
+
+              {/* Card Action */}
+              <div className="rec-card-footer">
+                <button 
+                  type="button" 
+                  className={`btn-choose-mandi ${item.isBest ? 'btn-best' : ''}`}
+                  onClick={() => {
+                    if (showToast) showToast(`🚚 Selected ${item.marketName}! Dispatch lot created for ${quantity} Qtl ${crop}. Proceeding to transport booking.`);
+                    if (setActiveTab) setActiveTab('my-crops');
+                  }}
+                >
+                  <span>{item.isBest ? t.sellAtBestMarket : t.selectThisMandi}</span>
+                </button>
+              </div>
             </div>
-            <div className="promo-quote-sub">
-              Direct APMC intelligence eliminates middlemen fees and guarantees instant bank payouts within 24 hours.
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>

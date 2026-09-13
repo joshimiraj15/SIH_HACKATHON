@@ -1,100 +1,158 @@
-# 🌾 Kishan Setu — Strengthening Market Linkages & Price Discovery for Farmers
+# 🚜 KisanSetu — Strengthening Market Linkages & Price Discovery for Farmers
 
-An end-to-end AI/ML-driven Agricultural Price Forecasting & Digital Marketplace platform built for **Smart India Hackathon (SIH)**.
-
----
-
-## 📌 Overview
-
-**Kishan Setu** empowers farmers with:
-1. **Intelligent Price Forecasting**: Accurate 3-day multi-step APMC price predictions using Machine Learning (Random Forest & XGBoost time-series models) with confidence intervals.
-2. **Transparent Price Discovery**: Real-time cross-mandi price comparison across districts and states to identify the best selling opportunities and maximize profits.
-3. **Smart Selling Recommendations**: Data-driven recommendations indicating whether farmers should sell now or hold, along with market reliability indicators.
-4. **Farmer Marketplace Backend**: Robust APIs for farmer crop listings, buyer offers, and order fulfillment.
+An AI-powered agricultural market intelligence platform designed for Indian farmers. KisanSetu integrates **Real-time Mandi Wholesale Prices**, **Gemini AI RAG Assistant with Multilingual Voice (Gujarati, Hindi, English)**, **3-Day ML Price Forecasting (XGBoost & Random Forest)**, **Buyer Marketplace**, and **Admin Portal**.
 
 ---
 
-## 🏗️ System Architecture & Directory Structure
+## 🌟 Main Project Features
 
-```
-SIH_HACKATHON/
-│
-├── farmer-price-discovery/             # Complete ML, Node backend & React Frontend Platform
-│   ├── data/
-│   │   └── market_prices.csv           # Historical APMC price dataset
-│   ├── ml/                             # Python ML Microservice (Port 5001)
-│   │   ├── preprocessing.py            # Data cleaning & chronological sorting
-│   │   ├── feature_engineering.py      # Lag & rolling window stats
-│   │   ├── train.py                    # Random Forest & XGBoost time-series training
-│   │   ├── evaluate.py                 # Evaluation metrics (MAE, RMSE, MAPE %, R²)
-│   │   ├── predict.py                  # Recursive 3-day forecasting engine
-│   │   ├── app.py                      # Flask REST API
-│   │   └── model/                      # Pre-trained models (price_model.pkl, model_meta.pkl)
-│   ├── backend/                        # Node.js Express REST Backend (Port 5000)
-│   │   ├── config/                     # MongoDB connection
-│   │   ├── controllers/                # Price, Prediction, Mandi & Recommendation logic
-│   │   ├── models/                     # MarketPrice, Prediction schemas
-│   │   ├── routes/                     # API route declarations
-│   │   ├── services/                   # ML microservice HTTP bridge
-│   │   ├── seed.js                     # APMC historical market prices database seeder
-│   │   └── server.js                   # Express server entry point
-│   └── frontend/                       # Interactive React 18 SPA (Port 3000)
-│       ├── src/components/             # Modern UI cards, charts & comparison tables
-│       ├── src/pages/                  # Farmer Dashboard, Price Discovery & Admin ML Dashboard
-│       └── vite.config.js              # Vite configuration
-│
-└── farmer-market-backend/              # Farmer & Buyer Marketplace Service
-    ├── config/                         # Database connection
-    ├── controllers/                    # Auth, Crops, Offers, Orders, Admin controllers
-    ├── middleware/                     # JWT authentication & Role-based access control
-    ├── models/                         # User, Crop, Offer, Order schemas
-    ├── routes/                         # REST API routes
-    └── server.js                       # Express marketplace server
-```
+1. **🎤 Multilingual Voice AI Assistant (`/assistant`)**:
+   - Web Speech API for voice speech-to-text in Gujarati (`gu-IN`), Hindi (`hi-IN`), and English (`en-US`).
+   - Text-to-Speech (`window.speechSynthesis`) audio output with 🔊 Speak, ⏹ Stop, 🔇 Mute controls.
+   - Large interactive microphone button with voice UI state indicators (🎤 Tap to Speak, 🔴 Listening..., 📝 Processing..., 🤖 AI Response, 🔊 Playing Answer...).
+   - Backend Gemini 1.5 Flash RAG service with live MongoDB market context.
 
----
+2. **📈 3-Day Machine Learning Price Forecast (`/prediction`)**:
+   - Time-series price regression models (XGBoost Regressor & Random Forest Regressor).
+   - 3-day future price trajectories (Day 1, Day 2, Day 3) with 95% confidence bands.
+   - Evaluated metrics: **MAE**, **RMSE**, and **R² Validation Score**.
+   - Smart selling recommendation badges:
+     - 🟢 **Good time to sell**
+     - 🟡 **Consider waiting**
+     - 🔴 **Price may decrease**
 
-## 🚀 Quick Start Guide
+3. **📊 Live APMC Mandi Rates (`/markets`)**:
+   - Integrated with keyless Mandi API (`https://mandi-api.vercel.app/v1/prices`).
+   - State filtering (Maharashtra, Gujarat, Punjab, UP, MP, Karnataka).
+   - Commodity filtering (Onion, Tomato, Wheat, Potato, Cotton, Groundnut, Soyabean, Mustard, etc.).
+   - Background MongoDB sync for data persistence.
 
-### Prerequisites
-- **Node.js**: v18+ or v20+
-- **Python**: 3.9+
-- **MongoDB**: Installed & running locally on `mongodb://localhost:27017`
+4. **🤝 Buyer Marketplace (`/buyers`)**:
+   - Direct connection between farmers and verified institutional buyers, food processors, and exporters.
+   - Filters by crop, location, quantity required, and offered rate per quintal.
+   - Offer submission and direct communication.
 
----
-
-### Step 1: Start Machine Learning Forecasting Service (Port 5001)
-```bash
-cd farmer-price-discovery/ml
-pip install flask flask-cors pandas numpy scikit-learn xgboost joblib
-python app.py
-```
-
-### Step 2: Seed Database & Start Backend API Service (Port 5000)
-```bash
-cd farmer-price-discovery/backend
-npm install
-node seed.js
-npm run dev # or node server.js
-```
-
-### Step 3: Start Frontend Interactive Dashboard (Port 3000)
-```bash
-cd farmer-price-discovery/frontend
-npm install
-npm run dev
-```
-Open **[http://localhost:3000](http://localhost:3000)** in your browser.
+5. **⚙️ Admin Portal (`/admin`)**:
+   - Manage crops, mandis, daily price entries, buyer listings, CSV dataset uploads, and ML system statistics.
 
 ---
 
 ## 🛠️ Technology Stack
-- **Frontend**: React 18, Vite, Tailwind CSS, Recharts, Lucide Icons, Axios
-- **Backend**: Node.js, Express.js, Mongoose, JWT, CORS
-- **ML / AI**: Python 3, Flask, Scikit-Learn, XGBoost, Pandas, NumPy, Joblib
-- **Database**: MongoDB
+
+- **Frontend**: React.js, Vite, HTML5, CSS3, Tailwind CSS, Axios, Lucide React Icons.
+- **Backend API**: Node.js, Express.js, MongoDB, Mongoose, JWT Authentication, BcryptJS.
+- **AI & RAG**: Google Gemini API (`@google/generative-ai` / REST API), Web Speech API, SpeechSynthesis API.
+- **ML Engine**: Python, Flask, Scikit-Learn, XGBoost, Pandas, NumPy, Joblib.
 
 ---
 
-## 👥 Contributors
-- **SIH Hackathon Team**
+## 📂 Project Architecture & Folder Structure
+
+```
+SIH_HACKATHON/
+│
+├── frontend/                     # React + Vite Frontend UI
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── chat/             # AIChatbot (Voice & Text Assistant)
+│   │   │   ├── views/            # MarketPrices, PriceForecast, BuyerMarketplace, AdminPanel
+│   │   │   ├── modals/           # AddCropModal, BuyerOfferModal, EditProfileModal
+│   │   │   └── layout/           # Header, Sidebar, Footer
+│   │   ├── services/
+│   │   │   └── api.js            # Axios client with JWT & fallback handlers
+│   │   └── App.jsx
+│   └── package.json
+│
+├── farmer-market-backend/        # Express Node.js REST API Server
+│   ├── controllers/              # auth, price, prediction, chat, buyer, admin controllers
+│   ├── models/                   # User, Crop, MarketPrice, Prediction, Buyer, ChatHistory
+│   ├── routes/                   # auth, price, prediction, chat, buyer, admin routes
+│   ├── services/                 # geminiService, mandiApiService, mlService
+│   ├── middleware/               # authMiddleware, roleMiddleware, errorMiddleware
+│   ├── tests/                    # Jest/Node API test suite
+│   ├── server.js                 # Entry point (Port 5000)
+│   └── package.json
+│
+└── farmer-price-discovery/       # Python Machine Learning Service
+    ├── data/                     # market_prices.csv historical dataset
+    ├── ml/
+    │   ├── model/                # price_model.pkl & model_meta.pkl
+    │   ├── train.py              # XGBoost/RandomForest model training pipeline
+    │   ├── predict.py            # 3-day recursive forecasting engine
+    │   ├── app.py                # Flask API server (Port 5001)
+    │   ├── tests/                # Pytest ML test suite
+    │   └── requirements.txt
+    └── README.md
+```
+
+---
+
+## 🔑 Environment Variables Setup (`.env`)
+
+Create a `.env` file in `farmer-market-backend/`:
+
+```env
+PORT=5000
+NODE_ENV=development
+MONGODB_URI=mongodb://localhost:27017/kishansetu
+JWT_SECRET=kishansetu_super_secret_jwt_key_2026
+GEMINI_API_KEY=your_google_gemini_api_key_here
+ML_API_URL=http://localhost:5001
+```
+
+Create a `.env` file in `farmer-price-discovery/`:
+
+```env
+PORT=5001
+FLASK_ENV=development
+```
+
+---
+
+## 🚀 How to Run the Complete System
+
+### 1. Start Python ML Price Forecasting API (Port 5001)
+```bash
+cd farmer-price-discovery/ml
+pip install -r requirements.txt
+python app.py
+```
+*(Runs Flask service on `http://localhost:5001`)*
+
+### 2. Start Node.js Express Backend Server (Port 5000)
+```bash
+cd farmer-market-backend
+npm install
+npm run dev
+```
+*(Runs Express server on `http://localhost:5000`)*
+
+### 3. Start React Frontend UI (Port 5173)
+```bash
+cd frontend
+npm install
+npm run dev
+```
+*(Opens web app on `http://localhost:5173`)*
+
+---
+
+## 🧪 Running Automated Test Suites
+
+### Run Backend API Unit Tests:
+```bash
+cd farmer-market-backend
+node tests/api.test.js
+```
+
+### Run Python ML Model Tests:
+```bash
+cd farmer-price-discovery/ml/tests
+python test_ml.py
+```
+
+---
+
+## 📄 License & Attribution
+
+Sourced agricultural data powered by Ministry of Agriculture and Farmers Welfare (data.gov.in) & Mandi Price API. Built for farmer empowerment and price discovery in India.

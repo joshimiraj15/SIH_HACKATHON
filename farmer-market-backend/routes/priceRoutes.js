@@ -9,7 +9,8 @@ const {
     discoverPrice,
     getPriceHistory,
     getPriceComparison,
-    deleteMarketPrice
+    deleteMarketPrice,
+    getLiveMandiPrices
 } = require('../controllers/priceController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorizeRoles } = require('../middleware/roleMiddleware');
@@ -18,7 +19,9 @@ router.route('/')
     .get(getAllMarketPrices)
     .post(protect, authorizeRoles('admin'), addMarketPrice);
 
+router.get('/live-mandi', getLiveMandiPrices);
 router.get('/comparison', getPriceComparison);
+
 router.get('/history', getPriceHistory);
 router.get('/search', searchPrices);
 router.get('/discover/:cropName', discoverPrice);

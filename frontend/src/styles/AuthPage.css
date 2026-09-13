@@ -283,6 +283,31 @@
   margin-bottom: 12px;
 }
 
+.po-input-error {
+  border-color: #ef4444 !important;
+  background-color: #fef2f2 !important;
+}
+
+.po-input-error:focus {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15) !important;
+}
+
+.po-field-error {
+  display: block;
+  font-size: 0.78rem;
+  color: #dc2626;
+  font-weight: 600;
+  margin-top: 4px;
+  animation: po-shake 0.3s ease-in-out;
+}
+
+@keyframes po-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
 /* Bottom Brand Section */
 .po-card-footer {
   display: flex;
@@ -324,6 +349,178 @@
   color: #222222;
   font-family: 'Inter', sans-serif;
   max-width: 240px;
+}
+
+/* OTP Overlay & Modal */
+.po-otp-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: po-fade-in 0.25s ease-out;
+}
+
+@keyframes po-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.po-otp-modal {
+  position: relative;
+  background: #ffffff;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 440px;
+  padding: 32px 28px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  animation: po-pop-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+@keyframes po-pop-up {
+  from { opacity: 0; transform: scale(0.92) translateY(16px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.po-otp-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  background: #f3f4f6;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #4b5563;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.po-otp-close-btn:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.po-otp-header {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.po-otp-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: #ecfdf5;
+  color: #059669;
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px auto;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+}
+
+.po-otp-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 6px 0;
+}
+
+.po-otp-subtitle {
+  font-size: 0.88rem;
+  color: #4b5563;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.po-otp-demo-banner {
+  background: #ecfdf5;
+  border: 1px dashed #059669;
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  color: #047857;
+}
+
+.po-otp-success-banner {
+  background: #ecfdf5;
+  border: 1.5px solid #a7f3d0;
+  color: #047857;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.po-otp-autofill-btn {
+  background: #059669;
+  color: #ffffff;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.po-otp-autofill-btn:hover {
+  background: #047857;
+}
+
+.po-otp-digits-container {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.po-otp-digit-input {
+  width: 48px;
+  height: 56px;
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  background: #f9fafb;
+  color: #111827;
+  transition: all 0.2s ease;
+}
+
+.po-otp-digit-input:focus {
+  border-color: #059669;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.15);
+  outline: none;
+}
+
+.po-otp-resend-row {
+  text-align: center;
+  font-size: 0.84rem;
+  color: #6b7280;
+  margin-bottom: 6px;
 }
 
 /* Responsive */

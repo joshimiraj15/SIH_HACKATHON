@@ -1,5 +1,6 @@
 // src/components/views/PriceRadar.jsx
 import React, { useState } from 'react';
+import { translations } from '../../data/translations';
 import { 
   Search, 
   MapPin, 
@@ -7,19 +8,17 @@ import {
   TrendingDown, 
   ArrowUpRight, 
   Sparkles, 
-  DollarSign, 
   ChevronRight,
-  Filter,
-  Navigation,
-  Globe2,
-  Truck,
   Package,
-  Layers
+  Layers,
+  Flame,
+  Activity
 } from 'lucide-react';
 import { STATE_MAPS } from '../../data/stateMapsData';
 import '../../styles/PriceRadar.css';
 
-const PriceRadar = ({ setActiveTab }) => {
+const PriceRadar = ({ setActiveTab, language }) => {
+  const t = translations[language] || translations.en;
   const [selectedStateKey, setSelectedStateKey] = useState('Gujarat');
   const [selectedCrop, setSelectedCrop] = useState('Wheat');
   const [quantity, setQuantity] = useState('50 Quintals');
@@ -48,16 +47,10 @@ const PriceRadar = ({ setActiveTab }) => {
     return {
       ...m,
       displayPrice: adjPrice,
-      displayFormatted: `₹${adjPrice.toLocaleString()}`
+      displayFormatted: `₹${adjPrice.toLocaleString()}`,
+      crop: selectedCrop
     };
   });
-
-  // Keep active mandi synced when state changes
-  const handleStateChange = (stateKey) => {
-    setSelectedStateKey(stateKey);
-    const newState = STATE_MAPS[stateKey] || STATE_MAPS.Gujarat;
-    setActiveMandi(newState.mandis[0]);
-  };
 
   const currentActiveMandi = currentMandis.find(m => m.id === activeMandi?.id) || currentMandis[0];
   const topMandi = currentMandis.find(m => m.isTop) || currentMandis[0];
@@ -67,8 +60,9 @@ const PriceRadar = ({ setActiveTab }) => {
       {/* Header */}
       <div className="radar-header">
         <div>
-          <h1>APMC Mandi Price Radar</h1>
-          <p>Real-time geographic price discovery across Gujarat districts and major agricultural market yards</p>
+          <span className="section-micro-tag">{t.geoMandiIntel}</span>
+          <h1>{t.priceRadarTitleAlt}</h1>
+          <p>{t.priceRadarDesc}</p>
         </div>
       </div>
 
@@ -77,27 +71,23 @@ const PriceRadar = ({ setActiveTab }) => {
         <div className="radar-filters-group">
           {/* Crop Selector */}
           <div className="radar-filter-item">
-            <label>Commodity</label>
+            <label>{t.cropCommodityLbl || "Crop / Commodity"}</label>
             <select 
               value={selectedCrop} 
               onChange={(e) => setSelectedCrop(e.target.value)}
               className="radar-select"
             >
-              <option value="Wheat">🌾 Wheat (ઘઉં)</option>
-              <option value="Cotton">🌱 Cotton (કપાસ)</option>
-              <option value="Groundnut">🥜 Groundnut (મગફળી)</option>
-              <option value="Tomato">🍅 Tomato (ટામેટા)</option>
-              <option value="Onion">🧅 Onion (ડુંગળી)</option>
-              <option value="Potato">🥔 Potato (બટાકા)</option>
-              <option value="Cumin">🌿 Cumin (જીરું)</option>
-              <option value="Soybean">🌱 Soybean (સોયાબીન)</option>
-              <option value="Mustard">🌼 Mustard (રાયડો)</option>
+              {t.cropOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
 
           {/* Quantity */}
           <div className="radar-filter-item">
-            <label>Lot Quantity</label>
+            <label>{t.harvestLotQty}</label>
             <input 
               type="text" 
               value={quantity} 
@@ -106,158 +96,75 @@ const PriceRadar = ({ setActiveTab }) => {
             />
           </div>
 
-          {/* Active State Dropdown */}
-          <div className="radar-filter-item">
-            <label>Active State</label>
-            <select
-              value={selectedStateKey}
-              onChange={(e) => handleStateChange(e.target.value)}
-              className="radar-select font-bold"
-            >
-              {Object.keys(STATE_MAPS).map((key) => (
-                <option key={key} value={key}>
-                  📍 {STATE_MAPS[key].label}
-                </option>
-              ))}
-            </select>
+          {/* Map Color Legend */}
+          <div className="radar-legend-bar">
+            <span className="legend-title">{t.priceLevelsLbl}</span>
+            <div className="legend-item"><span className="legend-dot dot-high" /> {t.levelHigh}</div>
+            <div className="legend-item"><span className="legend-dot dot-med" /> {t.levelMed}</div>
+            <div className="legend-item"><span className="legend-dot dot-low" /> {t.levelLow}</div>
           </div>
         </div>
 
         <div className="radar-header-metric">
-          <span className="metric-tag">Top Mandi Rate</span>
+          <span className="metric-tag">{t.peakMandiRate}</span>
           <span className="metric-val">{topMandi.displayFormatted} / Qtl</span>
+          <span className="metric-city">{t.atCityAPMC ? t.atCityAPMC.replace("{city}", topMandi.city) : `at ${topMandi.city} APMC`}</span>
         </div>
       </div>
 
-      {/* Main Grid: Official District Map + Side Details */}
+      {/* Main Grid: Gujarat Map + Side Mandi Intelligence */}
       <div className="radar-grid">
-        {/* Interactive State Map Card */}
+        {/* Interactive Gujarat Map Card */}
         <div className="radar-map-card">
-          {/* State Switcher Tabs on Map */}
-          <div className="map-state-tabs">
-            {Object.keys(STATE_MAPS).map((key) => {
-              const state = STATE_MAPS[key];
-              const isActive = selectedStateKey === key;
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  className={`state-tab-pill ${isActive ? 'active' : ''}`}
-                  onClick={() => handleStateChange(key)}
-                >
-                  <span className="state-dot" />
-                  <span>{state.name}</span>
-                </button>
-              );
-            })}
+          <div className="map-card-top-bar">
+            <div className="map-title-row">
+              <MapPin size={16} className="text-emerald-600" />
+              <strong>{t.gujaratAPMCMap}</strong>
+            </div>
+            <span className="map-tag-live">{t.liveAPMCFeeds}</span>
           </div>
 
           {/* Interactive Geographic Map Viewport */}
           <div className="map-viewport">
-            {/* If state has an official detailed district map image (e.g. Gujarat) */}
-            {currentState.mapImage ? (
-              <div className="official-district-map-wrap">
-                <img 
-                  src={currentState.mapImage} 
-                  alt="Official Gujarat District Administrative Map" 
-                  className="official-district-map-img" 
-                />
+            <div className="official-district-map-wrap">
+              <img 
+                src={currentState.mapImage} 
+                alt="Gujarat District Administrative Map" 
+                className="official-district-map-img" 
+              />
 
-                {/* Interactive Mandi Pins overlaying the official district map */}
-                {currentMandis.map((m) => {
-                  const isSelected = currentActiveMandi.id === m.id;
-                  let badgeType = 'medium';
-                  if (m.isTop) badgeType = 'top';
-                  else if (m.trend === 'down') badgeType = 'low';
+              {/* Interactive Mandi Pins with Colored Markers (High=Green, Med=Yellow, Low=Red) */}
+              {currentMandis.map((m) => {
+                const isSelected = currentActiveMandi.id === m.id;
+                const markerLevel = m.priceLevel || (m.isTop ? 'high' : m.trend === 'down' ? 'low' : 'medium');
 
-                  return (
-                    <div
-                      key={m.id}
-                      className={`map-pin-container ${isSelected ? 'selected' : ''}`}
-                      style={{ top: `${m.coords.y}%`, left: `${m.coords.x}%` }}
-                      onClick={() => setActiveMandi(m)}
-                      title={`Click to view ${m.name} APMC rates`}
-                    >
-                      <div className={`map-pin-badge ${badgeType}`}>
-                        <span className="pin-dot-circle" />
-                        <span className="pin-city">{m.city}</span>
-                        <span className="pin-price">{m.displayFormatted}</span>
-                      </div>
-                      {m.isTop && <div className="pin-pulse-ring" />}
-                      {isSelected && <div className="pin-active-indicator" />}
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              /* High-Fidelity SVG Map Fallback for other states */
-              <div className="svg-map-wrap">
-                <div className="map-grid-bg" aria-hidden="true" />
-                <svg 
-                  className="geographic-state-svg" 
-                  viewBox={currentState.viewBox} 
-                  fill="none" 
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d={currentState.svgPath}
-                    fill="#DCFCE7"
-                    fillOpacity="0.5"
-                    stroke="#22C55E"
-                    strokeWidth="2.5"
-                    strokeLinejoin="round"
-                    className="state-boundary-path"
-                  />
-                  <circle cx="260" cy="200" r="70" stroke="#15803D" strokeWidth="1" strokeDasharray="5 5" fill="none" opacity="0.25" />
-                  <circle cx="260" cy="200" r="140" stroke="#15803D" strokeWidth="1" strokeDasharray="5 5" fill="none" opacity="0.15" />
-                  <text 
-                    x="50%" 
-                    y="52%" 
-                    textAnchor="middle" 
-                    fill="#15803D" 
-                    fontSize="28" 
-                    fontWeight="900" 
-                    letterSpacing="6" 
-                    opacity="0.14"
+                return (
+                  <div
+                    key={m.id}
+                    className={`map-pin-container ${isSelected ? 'selected' : ''}`}
+                    style={{ top: `${m.coords.y}%`, left: `${m.coords.x}%` }}
+                    onClick={() => setActiveMandi(m)}
+                    title={`${m.name} - ${m.displayFormatted}/Qtl (${m.demand || "High"} Demand)`}
                   >
-                    {currentState.name.toUpperCase()}
-                  </text>
-                </svg>
-
-                {currentMandis.map((m) => {
-                  const isSelected = currentActiveMandi.id === m.id;
-                  let badgeType = 'medium';
-                  if (m.isTop) badgeType = 'top';
-                  else if (m.trend === 'down') badgeType = 'low';
-
-                  return (
-                    <div
-                      key={m.id}
-                      className={`map-pin-container ${isSelected ? 'selected' : ''}`}
-                      style={{ top: `${m.coords.y}%`, left: `${m.coords.x}%` }}
-                      onClick={() => setActiveMandi(m)}
-                    >
-                      <div className={`map-pin-badge ${badgeType}`}>
-                        <MapPin size={12} className="pin-icon" />
-                        <span className="pin-city">{m.city}</span>
-                        <span className="pin-price">{m.displayFormatted}</span>
-                      </div>
-                      {m.isTop && <div className="pin-pulse-ring" />}
-                      {isSelected && <div className="pin-active-indicator" />}
+                    <div className={`map-pin-badge marker-${markerLevel}`}>
+                      <span className="pin-dot-circle" />
+                      <span className="pin-city">{m.city}</span>
+                      <span className="pin-price">{m.displayFormatted}</span>
                     </div>
-                  );
-                })}
-              </div>
-            )}
+                    {markerLevel === 'high' && <div className="pin-pulse-ring" />}
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
-          {/* Bottom Alert Banner tailored to selected state & crop */}
+          {/* Bottom Alert Banner tailored to selected crop */}
           <div className="map-earnings-banner">
             <div className="map-earnings-icon">
               <Sparkles size={18} />
             </div>
             <div className="map-earnings-text">
-              Selling <strong>{quantity} of {selectedCrop}</strong> at <strong>{topMandi.name} ({topMandi.city})</strong> nets you the highest return in <strong>{currentState.name}</strong> at <strong>{topMandi.displayFormatted}/Qtl</strong> ({topMandi.change}).
+              {t.sellingNetsHighest ? t.sellingNetsHighest.replace("{qty}", quantity).replace("{crop}", selectedCrop).replace("{mandi}", `${topMandi.name} (${topMandi.city})`).replace("{price}", topMandi.displayFormatted).replace("{change}", topMandi.change) : `Selling ${quantity} of ${selectedCrop} at ${topMandi.name} (${topMandi.city}) nets you the highest return in Gujarat at ${topMandi.displayFormatted}/Qtl (${topMandi.change} price diff).`}
             </div>
           </div>
         </div>
@@ -268,35 +175,43 @@ const PriceRadar = ({ setActiveTab }) => {
           <div className="active-mandi-card">
             <div className="active-mandi-header">
               <span className={`status-badge ${currentActiveMandi.isTop ? 'top-badge' : 'standard-badge'}`}>
-                {currentActiveMandi.isTop ? '★ Top Mandi in State' : 'Live APMC Market'}
+                {currentActiveMandi.isTop ? t.topMandiGujarat : t.apmcMarketYard}
               </span>
-              <span className="arrival-badge">
-                <Package size={12} /> {currentActiveMandi.arrivalVol}
+              <span className={`demand-badge demand-${(currentActiveMandi.demand || 'High').toLowerCase()}`}>
+                <Flame size={12} /> {currentActiveMandi.demand || "High"} {t.demandLbl || "Demand"}
               </span>
             </div>
 
             <h3 className="mandi-card-title">{currentActiveMandi.name}</h3>
             <div className="mandi-district-text">
-              <MapPin size={13} /> {currentActiveMandi.city}, {currentState.name}
+              <MapPin size={13} /> {currentActiveMandi.city}, Gujarat • {currentActiveMandi.distance} {t.awayTxt}
             </div>
 
             <div className="mandi-price-display">
               <div className="price-big">{currentActiveMandi.displayFormatted}</div>
-              <div className="price-unit">/ Quintal</div>
+              <div className="price-unit">{t.perQuintal || "/ Quintal"}</div>
               <div className={`price-change-pill ${currentActiveMandi.trend === 'up' ? 'up' : 'down'}`}>
                 {currentActiveMandi.trend === 'up' ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-                <span>{currentActiveMandi.change} Today</span>
+                <span>{currentActiveMandi.change} {t.diffTxt}</span>
               </div>
             </div>
 
             <div className="mandi-specs-grid">
               <div className="spec-item">
-                <span className="spec-lbl">Primary Trade</span>
-                <span className="spec-val">{currentActiveMandi.specialty}</span>
+                <span className="spec-lbl">{t.selectedCropLbl}</span>
+                <span className="spec-val font-bold">{selectedCrop}</span>
               </div>
               <div className="spec-item">
-                <span className="spec-lbl">Est. Distance</span>
+                <span className="spec-lbl">{t.marketDemandLbl}</span>
+                <span className="spec-val text-emerald-700 font-bold">{currentActiveMandi.demand || 'High'}</span>
+              </div>
+              <div className="spec-item">
+                <span className="spec-lbl">{t.distanceLbl}</span>
                 <span className="spec-val">{currentActiveMandi.distance}</span>
+              </div>
+              <div className="spec-item">
+                <span className="spec-lbl">{t.dailyArrivalsLbl}</span>
+                <span className="spec-val">{currentActiveMandi.arrivalVol}</span>
               </div>
             </div>
 
@@ -305,15 +220,15 @@ const PriceRadar = ({ setActiveTab }) => {
               className="mandi-direct-route-btn"
               onClick={() => setActiveTab('where-to-sell')}
             >
-              <span>View Route & Direct Trade</span>
+              <span>{t.calcNetProfitMandi}</span>
               <ChevronRight size={16} />
             </button>
           </div>
 
-          {/* State Market Ranking List */}
+          {/* All Gujarat APMC Markets Table */}
           <div className="state-ranking-card">
             <div className="ranking-card-header">
-              <h4>All {currentState.name} APMC Yards</h4>
+              <h4>{t.gujaratAPMCLocations}</h4>
               <span className="crop-tag">{selectedCrop}</span>
             </div>
 
@@ -326,8 +241,13 @@ const PriceRadar = ({ setActiveTab }) => {
                 >
                   <div className="ranking-num">{idx + 1}</div>
                   <div className="ranking-info">
-                    <div className="ranking-name">{m.city} APMC</div>
-                    <div className="ranking-sub">{m.arrivalVol} • {m.distance}</div>
+                    <div className="ranking-name-row">
+                      <span className="ranking-name">{m.city} APMC</span>
+                      <span className={`ranking-demand-tag demand-${(m.demand || 'High').toLowerCase()}`}>
+                        {m.demand || "High"}
+                      </span>
+                    </div>
+                    <div className="ranking-sub">{selectedCrop} • {m.distance} {t.awayTxt}</div>
                   </div>
                   <div className="ranking-rate">
                     <div className="rate-val">{m.displayFormatted}</div>

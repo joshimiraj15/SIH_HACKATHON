@@ -1,137 +1,132 @@
 // src/components/views/MyCrops.jsx
+
 import React from 'react';
-import { 
-  Plus, 
-  ArrowUpRight, 
-  ArrowDownRight, 
-  ArrowRight, 
-  CheckCircle2, 
-  TrendingUp, 
-  Users, 
-  PlusCircle, 
-  Sprout, 
-  Info,
-  Droplets
-} from 'lucide-react';
-import { recentActivities } from '../../data/mockData';
+import { Plus, FileText, Trash2, Sprout } from 'lucide-react';
+import { translations } from '../../data/translations';
 import '../../styles/MyCrops.css';
 
-const MyCrops = ({ crops, setIsAddCropOpen, setActiveTab }) => {
+const MyCrops = ({ crops = [], setCrops, setIsAddCropOpen, setActiveTab, language }) => {
+  const t = translations[language] || translations.en;
+
+  const handleDeleteCrop = (cropId) => {
+    if (setCrops) {
+      const updated = crops.filter(c => c.id !== cropId);
+      setCrops(updated);
+      try {
+        localStorage.setItem('kisansetu_crops', JSON.stringify(updated));
+      } catch (e) {}
+    }
+  };
+
   return (
     <div className="my-crops-container">
       {/* Header */}
       <div className="my-crops-header">
         <div>
-          <h1>My Crops</h1>
-          <p>Track your crops, get insights and manage your produce</p>
+          <h1 className="mc-title">{t.myProduceAndCropInventory}</h1>
+          <p className="mc-subtitle">{t.manageCropLotsSubtitle}</p>
         </div>
 
         <button 
-          className="add-crop-btn"
+          type="button"
+          className="mc-add-btn"
           onClick={() => setIsAddCropOpen(true)}
         >
-          <Plus size={18} />
-          <span>Add Crop</span>
+          <Plus size={16} />
+          <span>{t.addCropLot}</span>
         </button>
       </div>
 
-      {/* 4 Crop Cards */}
-      <div className="crops-grid-row">
-        {crops.map((crop) => (
-          <div key={crop.id} className="crop-card">
-            <div className="crop-card-img-wrap">
-              <img src={crop.image} alt={crop.name} className="crop-card-img" />
-            </div>
-
-            <div className="crop-card-body">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                <div className="crop-name-title">{crop.name}</div>
-                <span className="grade-badge-tag" style={{
-                  background: crop.grade === 'GRADE_A' ? '#dcfce7' : '#f3f4f6',
-                  color: crop.grade === 'GRADE_A' ? '#15803d' : '#374151',
-                  padding: '2px 8px',
-                  borderRadius: '12px',
-                  fontSize: '0.72rem',
-                  fontWeight: '700'
-                }}>
-                  {crop.grade || 'GRADE_A'}
-                </span>
-              </div>
-              <div className="crop-qty-label">{crop.quantity} • Lot Status: <strong style={{ color: '#2d6a4f' }}>{crop.status || 'LISTED'}</strong></div>
-
-              <div className="crop-price-row">
-                <div className="crop-price-val">
-                  ₹{crop.price} <span>{crop.unit}</span>
-                </div>
-
-                <span className={`crop-trend-pill ${crop.trend === 'up' ? 'up' : 'down'}`}>
-                  {crop.trend === 'up' ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-                  {crop.change}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Bottom Grid: Crop Health & Advisory + Recent Activities */}
-      <div className="crops-bottom-grid">
-        {/* Crop Health & Advisory */}
-        <div className="health-advisory-card">
-          <div>
-            <h3>Crop Health & Advisory</h3>
-
-            <div className="advisory-item-row">
-              <span className="advisory-crop-name">Wheat</span>
-              <span className="health-status-badge">
-                <CheckCircle2 size={12} /> Good Health
-              </span>
-            </div>
-
-            <div className="advisory-tips-box">
-              <Droplets size={18} color="#16a34a" />
-              <span><strong>Tips:</strong> Irrigation needed in 3 days. Soil moisture optimal.</span>
-            </div>
-          </div>
-
-          <div 
-            className="advisory-view-link"
-            onClick={() => setActiveTab('price-forecast')}
+      {/* Grid or Empty State */}
+      {crops.length === 0 ? (
+        <div className="mc-empty-state">
+          <Sprout size={36} className="mc-empty-icon" />
+          <h3>{language === 'gu' ? 'હજુ સુધી કોઈ પાક ઉમેરેલ નથી' : language === 'hi' ? 'अभी तक कोई फसल नहीं जोड़ी गई' : 'No Produce Lots Listed Yet'}</h3>
+          <p>{language === 'gu' ? 'તમારો પાક, વજન અને અંદાજિત ભાવ ઉમેરવા માટે "+ પાક લોટ ઉમેરો" પર ક્લિક કરો.' : language === 'hi' ? 'अपनी फसल, मात्रा और अपेक्षित भाव जोड़ने के लिए "+ फसल लॉट जोड़ें" पर क्लिक करें।' : 'Add your crop, harvest quantity, and expected price to start receiving direct buyer offers.'}</p>
+          <button 
+            type="button"
+            className="mc-add-btn"
+            onClick={() => setIsAddCropOpen(true)}
           >
-            <span>View Full Diagnostic Details</span>
-            <ArrowRight size={14} />
-          </div>
-
-          <div className="advisory-bg-leaves">
-            <Sprout size={90} color="#16a34a" />
-          </div>
+            <Plus size={16} />
+            <span>{t.addCropLot}</span>
+          </button>
         </div>
+      ) : (
+        <div className="mc-grid">
+          {crops.map((crop, idx) => {
+            const isDown = crop.trend === 'down';
+            const displayPrice = crop.price && String(crop.price) !== 'NaN' ? crop.price : '2,480';
+            const displayQuantity = crop.quantity || (crop.qtyValue ? `${crop.qtyValue} Quintals` : '500 kg');
+            const displayStatus = crop.status || t.readyForMandi;
+            const displayName = crop.name || crop.cropName || 'Crop Lot';
 
-        {/* Recent Activities */}
-        <div className="activities-card">
-          <h3>Recent Activities</h3>
-
-          <div className="activities-list">
-            {recentActivities.map((act) => {
-              let Icon = TrendingUp;
-              if (act.type === 'buyer') Icon = Users;
-              if (act.type === 'crop') Icon = PlusCircle;
-
-              return (
-                <div key={act.id} className="activity-item">
-                  <div className="activity-left">
-                    <div className="activity-icon-wrap">
-                      <Icon size={16} />
-                    </div>
+            return (
+              <div key={crop.id || idx} className="mc-card">
+                <div className="mc-card-img-wrap">
+                  <img src={crop.image} alt={displayName} className="mc-card-img" />
+                  <button
+                    type="button"
+                    className="mc-delete-crop-btn"
+                    title={language === 'gu' ? 'પાક દૂર કરો' : 'Remove crop lot'}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteCrop(crop.id);
+                    }}
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+                <div className="mc-card-body">
+                  <div className="mc-card-row-top">
                     <div>
-                      <div className="activity-text-title">{act.title}</div>
-                      <div className="activity-text-sub">{act.detail}</div>
+                      <h3 className="mc-crop-title">{displayName}</h3>
+                      {crop.variety && <div className="mc-crop-variety-sub">{crop.variety}</div>}
+                    </div>
+                    <span className="mc-grade-tag">{crop.grade || 'GRADE_A'}</span>
+                  </div>
+                  <div className="mc-card-meta">
+                    <strong>{displayQuantity}</strong> • {t.lotStatusPrefix} <span className={isDown ? "mc-status-normal" : "mc-status-highlight"}>{displayStatus}</span>
+                  </div>
+                  <div className="mc-price-row">
+                    <div className="mc-price-val">₹{displayPrice} <span>{crop.unit || '/ Q'}</span></div>
+                    <div className={`mc-trend-pill ${isDown ? 'down' : 'up'}`}>
+                      {isDown ? '↘ -4.1%' : `↗ ${crop.change || '+5.0%'}`}
                     </div>
                   </div>
-                  <div className="activity-time-tag">{act.time}</div>
                 </div>
-              );
-            })}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Incoming Offers */}
+      <div className="mc-offers-section">
+        <div className="mc-offers-header">
+          <div className="mc-offers-header-left">
+            <div className="mc-offers-title">
+              <div className="mc-icon-blue-wrap">
+                <FileText size={18} className="mc-icon-blue" />
+              </div>
+              <h2>{t.incomingBuyerOffers} (1)</h2>
+            </div>
+            <p className="mc-offers-sub">{t.directProcurementOffers}</p>
+          </div>
+          <button className="mc-view-messages-btn" onClick={() => setActiveTab('messages')}>{t.viewMessagesArrow}</button>
+        </div>
+
+        <div className="mc-offer-list">
+          <div className="mc-offer-card">
+            <div className="mc-offer-top">
+              <span className="mc-offer-crop">Wheat (Sharbati Gold)</span>
+              <span className="mc-offer-badge pending">{t.offerPending}</span>
+            </div>
+            <h3 className="mc-offer-buyer">AgroFresh Foods</h3>
+            <div className="mc-offer-rate-row">
+              <span className="mc-rate-lbl">{t.offeredRateLbl}</span>
+              <span className="mc-rate-val">₹2,520 / Q</span>
+            </div>
           </div>
         </div>
       </div>

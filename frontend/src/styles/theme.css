@@ -1,39 +1,40 @@
-/* src/styles/theme.css - Modern KishanSetu Agricultural Design System */
+/* src/styles/theme.css - Modern KisanSetu Agricultural Design System */
 
 :root {
-  /* Main Backgrounds & Surfaces */
-  --bg-body: #F4F6F9;
-  --bg-main: #F4F6F9;
+  /* Main Colors per Project Design Specification */
+  --primary-green: #10B981;
+  --dark-green: #047857;
+  --deep-agri-green: #15803D;
+  --accent-yellow: #FBBF24;
+  --bg-body: #F5F7F4;
   --bg-card: #FFFFFF;
-  --bg-card-muted: #F8F9FA;
-  --bg-glass: rgba(255, 255, 255, 0.92);
+  --text-dark: #17251C;
+  --text-secondary: #647067;
+  --border-color: #E5E7EB;
 
-  /* Sidebar Palette - Crisp Clean White (Ref: 3.webp) */
+  /* Aliases for Backward & Component Compatibility */
+  --primary: #10B981;
+  --primary-dark: #047857;
+  --primary-deep: #15803D;
+  --primary-light: #34D399;
+  --primary-subtle: #ECFDF5;
+  --primary-border: #A7F3D0;
+
+  --accent: #FBBF24;
+  --accent-hover: #F59E0B;
+  --accent-subtle: #FEF3C7;
+
+  --bg-main: #F5F7F4;
+  --bg-glass: rgba(255, 255, 255, 0.94);
   --bg-sidebar: #FFFFFF;
-  --bg-sidebar-darker: #F8F9FA;
-  --bg-sidebar-hover: #F2F4F7;
-  --bg-sidebar-active: #FFF2EE;
-  --sidebar-text: #4B5563;
-  --sidebar-text-muted: #9CA3AF;
-  --sidebar-active-text: #FF5A36;
-  --sidebar-accent: #FF5A36;
+  --bg-sidebar-hover: #F0FDF4;
+  --bg-sidebar-active: #ECFDF5;
 
-  /* Primary Brand - Forest Green & Emerald */
-  --primary: #15803D;
-  --primary-dark: #0F5C2B;
-  --primary-light: #22C55E;
-  --primary-subtle: #DCFCE7;
-  --primary-border: #BBF7D0;
+  --text-main: #17251C;
+  --text-body: #374151;
+  --text-muted: #647067;
+  --text-light: #9CA3AF;
 
-  /* Vibrant Accent Colors */
-  --coral-primary: #FF5A36;
-  --coral-light: #FF7E61;
-  --coral-subtle: #FFF2EE;
-  --amber-primary: #D97706;
-  --amber-light: #F59E0B;
-  --amber-subtle: #FEF3C7;
-  --amber-border: #FDE68A;
-  
   /* Status Colors */
   --success: #10B981;
   --success-bg: #ECFDF5;
@@ -41,33 +42,37 @@
   --danger: #EF4444;
   --danger-bg: #FEF2F2;
   --danger-border: #FECACA;
-  --info: #3B82F6;
-  --info-bg: #EFF6FF;
+  --warning: #F59E0B;
+  --warning-bg: #FFFBEB;
+  --warning-border: #FDE68A;
+  --info: #0284C7;
+  --info-bg: #F0F9FF;
+  --info-border: #BAE6FD;
 
-  /* Neutrals & Typography */
-  --text-main: #111827;
-  --text-body: #374151;
-  --text-muted: #6B7280;
-  --text-light: #9CA3AF;
-  --border-color: #E5E7EB;
-  --border-subtle: #F3F4F6;
+  /* Premium Gradients */
+  --gradient-hero: linear-gradient(135deg, #10B981 0%, #047857 50%, #15803D 100%);
+  --gradient-cta: linear-gradient(135deg, #10B981 0%, #047857 100%);
+  --gradient-card: linear-gradient(180deg, #FFFFFF 0%, #F9FAF8 100%);
+  --gradient-accent: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
+  --gradient-green-soft: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
 
   /* Modern Card Shadows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
-  --shadow-lg: 0 12px 28px -4px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
-  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.04);
-  --shadow-card-hover: 0 10px 24px rgba(0, 0, 0, 0.08);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
+  --shadow-card: 0 2px 10px rgba(23, 37, 28, 0.05);
+  --shadow-card-hover: 0 12px 28px rgba(16, 185, 129, 0.12), 0 4px 10px rgba(0, 0, 0, 0.04);
 
   /* Border Radii */
   --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --radius-xl: 24px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
   --radius-pill: 9999px;
 
   /* Typography */
-  --font-family: 'Inter', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* Global Reset & Base */
@@ -77,19 +82,23 @@
   padding: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: var(--font-family);
   background-color: var(--bg-body);
-  color: var(--text-main);
+  color: var(--text-dark);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom Smooth Scrollbars */
+/* Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
@@ -98,7 +107,7 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background: #CBD5E1;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb:hover {

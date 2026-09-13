@@ -25,12 +25,20 @@ app.get('/', (req, res) => {
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/crops', require('./routes/cropRoutes'));
 app.use('/api/prices', require('./routes/priceRoutes'));
+app.use('/api/market-prices', require('./routes/priceRoutes'));
 app.use('/api/offers', require('./routes/offerRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/predictions', require('./routes/predictionRoutes'));
+app.use('/api/prediction', require('./routes/predictionRoutes'));
+app.use('/api/forecast', require('./routes/predictionRoutes'));
 app.use('/api/recommendations', require('./routes/recommendationRoutes'));
-app.use('/api', require('./routes/marketRoutes'));
+app.use('/api/chat', require('./routes/chatRoutes'));
+app.use('/api/buyers', require('./routes/buyerRoutes'));
+app.use('/api/weather', require('./routes/weatherRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
+
+app.use('/api', require('./routes/marketRoutes'));
+
 
 // Error Middlewares
 app.use(notFound);

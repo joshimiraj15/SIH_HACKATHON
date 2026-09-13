@@ -7,25 +7,34 @@ import {
   Globe, 
   LogOut, 
   User, 
-  Sun,
-  Droplets,
-  Wind,
-  MapPin,
+  MapPin, 
   Sparkles,
-  CloudRain
+  Menu,
+  Activity,
+  CheckCircle2
 } from 'lucide-react';
 import { notificationsList } from '../../data/mockData';
 import { translations } from '../../data/translations';
 import { fetchLiveWeather } from '../../services/weatherService';
+import { checkBackendHealth } from '../../services/api';
 import '../../styles/Header.css';
 
-const Header = ({ activeTab, setActiveTab, language, setLanguage, user, onLogout }) => {
+const Header = ({ 
+  activeTab, 
+  setActiveTab, 
+  language, 
+  setLanguage, 
+  user, 
+  onLogout,
+  onOpenMobileSidebar 
+}) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [showWeatherDropdown, setShowWeatherDropdown] = useState(false);
   const [notifications, setNotifications] = useState(notificationsList);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isBackendLive, setIsBackendLive] = useState(false);
   
   // Real-time weather state from Open-Meteo
   const [weatherData, setWeatherData] = useState(null);
@@ -48,6 +57,11 @@ const Header = ({ activeTab, setActiveTab, language, setLanguage, user, onLogout
         if (isMounted) setWeatherLoading(false);
       });
 
+    // Check backend health
+    checkBackendHealth().then((res) => {
+      if (isMounted) setIsBackendLive(res.online);
+    });
+
     return () => {
       isMounted = false;
     };
@@ -55,12 +69,16 @@ const Header = ({ activeTab, setActiveTab, language, setLanguage, user, onLogout
 
   const screens = [
     { id: 'home', num: '1', name: t.navHome || 'Home' },
-    { id: 'price-radar', num: '2', name: t.navPriceRadar || 'Mandi Radar' },
+    { id: 'price-radar', num: '2', name: t.navPriceRadar || 'Price Radar' },
     { id: 'where-to-sell', num: '3', name: t.navWhereToSell || 'Where to Sell' },
-    { id: 'buyers', num: '4', name: t.navBuyers || 'Buyers' },
-    { id: 'my-crops', num: '5', name: t.navMyCrops || 'My Crops' },
-    { id: 'price-forecast', num: '6', name: t.navPriceForecast || 'Forecast' },
-    { id: 'profile', num: '7', name: t.navProfile || 'Profile' }
+    { id: 'market-prices', num: '4', name: t.navMarketPrices || 'Market Prices' },
+    { id: 'buyers', num: '5', name: t.navBuyers || 'Buyers' },
+    { id: 'my-crops', num: '6', name: t.navMyCrops || 'My Crops' },
+    { id: 'price-forecast', num: '7', name: t.navPriceForecast || 'Forecast' },
+    { id: 'price-journey', num: '8', name: 'Price Journey' },
+    { id: 'schemes', num: '9', name: 'Govt Schemes' },
+    { id: 'messages', num: '10', name: 'Messages' },
+    { id: 'profile', num: '11', name: t.navProfile || 'Profile' }
   ];
 
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -76,33 +94,74 @@ const Header = ({ activeTab, setActiveTab, language, setLanguage, user, onLogout
   ];
 
   const currentLangObj = languagesList.find(l => l.code === language) || languagesList[0];
-  const firstName = (user?.name || 'Meet').split(' ')[0];
+  const firstName = (user?.name || 'Farmer').split(' ')[0];
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    const q = searchQuery.toLowerCase();
+    if (q.includes('buyer') || q.includes('company')) {
+      setActiveTab('buyers');
+    } else if (q.includes('price') || q.includes('mandi') || q.includes('rate')) {
+      setActiveTab('market-prices');
+    } else if (q.includes('where') || q.includes('sell') || q.includes('recommend')) {
+      setActiveTab('where-to-sell');
+    } else if (q.includes('radar') || q.includes('map') || q.includes('district')) {
+      setActiveTab('price-radar');
+    } else if (q.includes('forecast') || q.includes('predict')) {
+      setActiveTab('price-forecast');
+    } else if (q.includes('scheme') || q.includes('pm-kisan') || q.includes('subsidy')) {
+      setActiveTab('schemes');
+    } else {
+      setActiveTab('market-prices');
+    }
+  };
 
   return (
     <header className="kisan-header-wrapper">
       <div className="kisan-top-header">
-        {/* Left: Personalized Greeting */}
+        {/* Mobile Hamburger Toggle & Personalized Greeting */}
         <div className="header-greeting-block">
-          <h1 className="header-greeting-title">Hi, {firstName} 👋</h1>
-          <p className="header-greeting-sub">Live APMC Intelligence & Mandi Trading Hub</p>
+          <button 
+            type="button" 
+            className="mobile-hamburger-btn" 
+            onClick={onOpenMobileSidebar}
+            aria-label="Open menu"
+          >
+            <Menu size={22} />
+          </button>
+
+          <div>
+            <h1 className="header-greeting-title">Hi, {firstName} 👋</h1>
+            <p className="header-greeting-sub">Live APMC Intelligence & Mandi Trading Hub</p>
+          </div>
         </div>
 
         {/* Center: Search Bar */}
         <div className="header-search-wrapper">
-          <div className="header-search-pill">
+          <form onSubmit={handleSearchSubmit} className="header-search-pill">
             <Search size={16} className="search-icon" />
             <input 
               type="text" 
-              placeholder="Search mandi prices, crops, buyers, APMC..." 
+              placeholder="Search crops, buyers, APMC markets..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="search-input"
             />
-          </div>
+          </form>
         </div>
 
-        {/* Right Action Icons: Live Open-Meteo Weather, Language, Bell, Profile */}
+        {/* Right Action Icons: Backend Status, Weather, Language, Bell, Profile */}
         <div className="header-right-actions">
+          {/* Backend Connection Status Badge */}
+          <div 
+            className={`backend-status-pill ${isBackendLive ? 'online' : 'fallback'}`}
+            title={isBackendLive ? 'Connected to Node.js Backend API' : 'Using Local AgriTech Mock Engine'}
+          >
+            <span className="status-indicator-dot" />
+            <span className="status-label-txt">{isBackendLive ? 'Backend Live' : 'Mock Engine'}</span>
+          </div>
+
           {/* Live Open-Meteo Weather Pill */}
           <div className="weather-menu-wrap">
             <button 
@@ -129,13 +188,12 @@ const Header = ({ activeTab, setActiveTab, language, setLanguage, user, onLogout
               <div className="dropdown-panel weather-dropdown">
                 <div className="weather-drop-header">
                   <div className="weather-drop-title">
-                    <MapPin size={14} className="text-amber-600" />
+                    <MapPin size={14} className="text-emerald-600" />
                     <span>{weatherData?.district || userDistrict}, Gujarat</span>
                   </div>
                   <span className="weather-api-badge">Open-Meteo Live</span>
                 </div>
 
-                {/* Main Temperature Card */}
                 <div className="weather-main-row">
                   <div className="weather-big-icon">{weatherData?.icon || '🌤️'}</div>
                   <div className="weather-temp-block">
@@ -144,7 +202,6 @@ const Header = ({ activeTab, setActiveTab, language, setLanguage, user, onLogout
                   </div>
                 </div>
 
-                {/* Humidity, Wind, Feels Like Metrics */}
                 <div className="weather-metrics-grid">
                   <div className="weather-metric-cell">
                     <div className="met-label">💧 Humidity</div>
@@ -160,27 +217,10 @@ const Header = ({ activeTab, setActiveTab, language, setLanguage, user, onLogout
                   </div>
                 </div>
 
-                {/* Agricultural Advisory */}
                 <div className="weather-advisory-box">
                   <strong>🌱 Agricultural Advisory:</strong>
                   <div>{weatherData?.advisory || 'Optimal weather for harvesting, grain drying and APMC mandi trade.'}</div>
                 </div>
-
-                {/* 5-Day Forecast Row */}
-                {weatherData?.daily && weatherData.daily.length > 0 && (
-                  <div className="weather-forecast-days">
-                    {weatherData.daily.map((day, idx) => (
-                      <div key={idx} className="forecast-day-item">
-                        <span className="day-name">{day.day}</span>
-                        <span className="day-icon">{day.icon}</span>
-                        <span className="day-temps">{day.maxTemp}° / {day.minTemp}°</span>
-                        {day.rainProb > 0 && (
-                          <span className="day-rain">💧{day.rainProb}%</span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
             )}
           </div>
@@ -269,7 +309,7 @@ const Header = ({ activeTab, setActiveTab, language, setLanguage, user, onLogout
             )}
           </div>
 
-          {/* User Profile Avatar */}
+          {/* User Profile Avatar with Name & Dropdown */}
           <div className="profile-menu-wrap">
             <div 
               className="header-avatar-btn"
@@ -279,13 +319,15 @@ const Header = ({ activeTab, setActiveTab, language, setLanguage, user, onLogout
                 setShowLangMenu(false);
                 setShowNotifications(false);
               }}
-              title="Account Menu"
+              title="Farmer Profile Menu"
             >
               <img 
                 src={user?.avatar || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80"} 
                 alt={user?.name || "Farmer"} 
                 className="header-avatar-img"
               />
+              <span className="header-farmer-name-tag">{firstName}</span>
+              <ChevronDown size={13} className="text-gray-400" />
             </div>
 
             {showProfileMenu && (
@@ -318,25 +360,6 @@ const Header = ({ activeTab, setActiveTab, language, setLanguage, user, onLogout
         </div>
       </div>
 
-      {/* Screen Gallery Navigation Switcher */}
-      <div className="screen-switcher-bar">
-        <div className="screen-switcher-tag">
-          <Sparkles size={13} /> Screens:
-        </div>
-        <div className="screen-pills-list">
-          {screens.map((s) => (
-            <button
-              key={s.id}
-              type="button"
-              className={`screen-pill-btn ${activeTab === s.id ? 'active' : ''}`}
-              onClick={() => setActiveTab(s.id)}
-            >
-              <span className="pill-num">{s.num}</span>
-              <span>{s.name}</span>
-            </button>
-          ))}
-        </div>
-      </div>
     </header>
   );
 };

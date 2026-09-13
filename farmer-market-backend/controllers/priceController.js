@@ -1,5 +1,7 @@
 const MarketPrice = require('../models/MarketPrice');
 const { discoverPriceLogic } = require('../utils/priceDiscovery');
+const { fetchLiveMandiPrices } = require('../services/mandiApiService');
+
 
 exports.addMarketPrice = async (req, res, next) => {
     try {
@@ -290,3 +292,51 @@ exports.deleteMarketPrice = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.getLiveMandiPrices = async (req, res, next) => {
+    try {
+        const { state = 'Maharashtra', commodity = 'Onion' } = req.query;
+        const liveResult = await fetchLiveMandiPrices(state, commodity);
+        
+        // Optional background sync to DB if DB is available
+        if (liveResult.data && Array.isArray(liveResult.data)) {
+            MarketPrice.bulkWrite(
+                liveResult.data.map(item => ({
+                    updateOne: {
+                        filter: { 
+                            marketName: item.market || item.marketName, 
+                            cropName: item.commodity || item.cropName, 
+                            date: item.arrival_date || item.date || new Date().toISOString().split('T')[0]
+                        },
+                        update: {
+                            $set: {
+                                cropName: item.commodity || item.cropName,
+                                marketName: item.market || item.marketName,
+                                state: item.state,
+                                district: item.district,
+                                date: item.arrival_date || item.date || new Date().toISOString().split('T')[0],
+                                minPrice: item.min_price || item.minPrice || 0,
+                                maxPrice: item.max_price || item.maxPrice || 0,
+                                modalPrice: item.modal_price || item.modalPrice || 0,
+                                unit: item.unit || 'Quintal'
+                            }
+                        },
+                        upsert: true
+                    }
+                }))
+            ).catch(err => console.warn('[DB Sync Warn] Non-fatal bulkWrite error:', err.message));
+        }
+
+        res.status(200).json({
+            success: true,
+            message: `Fetched live Mandi prices for ${commodity} in ${state}`,
+            source: liveResult.source,
+            isFallback: liveResult.isFallback || false,
+            count: liveResult.count || liveResult.data.length,
+            data: liveResult.data
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+

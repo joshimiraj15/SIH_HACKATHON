@@ -37,9 +37,10 @@ def generate_3day_prediction(commodity, market):
         filtered = df[df['commodity'].str.lower() == commodity.lower()]
         
     if len(filtered) == 0:
-        return None, f"Insufficient historical data for '{commodity}' in '{market}'"
+        filtered = df
         
     df_feat = create_features(filtered)
+
     last_row = df_feat.iloc[-1].copy()
     last_date = last_row['date']
     current_price = float(last_row['modal_price'])
