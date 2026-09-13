@@ -1,92 +1,141 @@
-/* src/styles/Sidebar.css - Crisp Modern White Sidebar (Ref: 3.webp) */
+/* src/styles/Sidebar.css - Modern AgriTech Sidebar */
 
+/* ── Container ─────────────────────────────────────────────── */
 .kisan-sidebar {
-  width: 250px;
-  min-width: 250px;
-  background: #FFFFFF;
-  color: #111827;
+  width: 256px;
+  min-width: 256px;
+  background: #ffffff;
+  color: #17251C;
   display: flex;
   flex-direction: column;
-  padding: 24px 16px 20px 16px;
+  padding: 18px 12px 16px 12px;
   height: 100vh;
   position: sticky;
   top: 0;
   overflow-y: auto;
-  border-right: 1px solid #EAECEF;
-  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.02);
+  border-right: 1px solid #E5E7EB;
+  box-shadow: 2px 0 16px rgba(0,0,0,0.04);
   z-index: 50;
   user-select: none;
   box-sizing: border-box;
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+  scrollbar-width: thin;
+  scrollbar-color: #D1FAE5 transparent;
 }
+.kisan-sidebar::-webkit-scrollbar { width: 4px; }
+.kisan-sidebar::-webkit-scrollbar-thumb { background: #D1FAE5; border-radius: 4px; }
 
-/* Brand Logo */
+/* ── Brand Header ───────────────────────────────────────────── */
+.sidebar-brand-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #F0F2F5;
+  margin-bottom: 10px;
+}
 .kisan-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 4px 8px 20px 8px;
-  border-bottom: 1px solid #F0F2F5;
-  margin-bottom: 18px;
+  gap: 10px;
+  cursor: pointer;
 }
-
 .brand-icon-wrapper {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: #15803D;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #10B981 0%, #047857 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #FFFFFF;
-  box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
+  box-shadow: 0 4px 10px rgba(16,185,129,0.25);
   flex-shrink: 0;
 }
-
+.brand-sprout-emoji { font-size: 1.15rem; }
 .brand-text h2 {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 800;
-  letter-spacing: -0.025em;
-  color: #111827;
+  letter-spacing: -0.02em;
+  color: #17251C;
   line-height: 1.1;
+  margin: 0;
+}
+.brand-text h2 span { color: #10B981; }
+.brand-tagline {
+  font-size: 0.63rem;
+  color: #647067;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  display: block;
+  margin-top: 1px;
+}
+.sidebar-mobile-close {
+  display: none;
+  background: transparent;
+  border: none;
+  color: #647067;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+}
+
+/* ── Landing Shortcut ───────────────────────────────────────── */
+.sidebar-quick-landing { margin-bottom: 10px; }
+.landing-shortcut-btn {
+  width: 100%;
   display: flex;
   align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  border-radius: 10px;
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: #047857;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.landing-shortcut-btn:hover {
+  background: #DCFCE7;
+  border-color: #86EFAC;
 }
 
-.brand-text h2 span {
-  color: #15803D;
-  margin-left: 1px;
+/* ── VIEWS Section Label ────────────────────────────────────── */
+.sidebar-views-label {
+  padding: 0 4px 6px 4px;
+  margin-bottom: 2px;
+}
+.sidebar-views-label span {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #9CA3AF;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
-.brand-tagline {
-  font-size: 0.68rem;
-  color: #6B7280;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  display: block;
-  margin-top: 2px;
-}
-
-/* Navigation List */
+/* ── Navigation List ────────────────────────────────────────── */
 .nav-section {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 2px;
+  padding-bottom: 12px;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 14px;
-  border-radius: 14px;
+  padding: 9px 10px;
+  border-radius: 10px;
   color: #4B5563;
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   font-weight: 500;
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.16s ease;
   width: 100%;
   text-align: left;
   font-family: inherit;
@@ -96,136 +145,201 @@
 .nav-item-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  min-width: 0;
 }
 
-.nav-item .icon {
+.nav-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6B7280;
-  transition: all 0.2s ease;
+  color: #9CA3AF;
+  transition: color 0.16s ease;
+  flex-shrink: 0;
+  width: 20px;
+}
+
+.nav-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
 }
 
 .nav-item:hover {
-  background: #F3F4F6;
-  color: #111827;
+  background: #F5F7F4;
+  color: #17251C;
 }
+.nav-item:hover .nav-icon { color: #10B981; }
 
-.nav-item:hover .icon {
-  color: #111827;
-}
-
-/* Active Nav State - Soft Coral Peach (Direct Ref: 3.webp) */
+/* Active state */
 .nav-item.active {
-  background: #FFF2EE;
-  color: #FF5A36;
+  background: linear-gradient(90deg, #ECFDF5 0%, #F0FDF4 100%);
+  color: #047857;
   font-weight: 700;
+  border-left: 3px solid #10B981;
+  padding-left: 7px;
 }
+.nav-item.active .nav-icon { color: #10B981; }
 
-.nav-item.active .icon {
-  color: #FF5A36;
-}
-
-/* Nav Badges */
+/* ── Badges ─────────────────────────────────────────────────── */
 .nav-badge {
-  font-size: 0.68rem;
+  font-size: 0.6rem;
   font-weight: 700;
-  padding: 2px 7px;
+  padding: 2px 6px;
   border-radius: 999px;
   background: #F3F4F6;
-  color: #4B5563;
+  color: #6B7280;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
+.nav-item.active .nav-badge { background: #D1FAE5; color: #047857; }
+.badge-live  { background: #DCFCE7 !important; color: #15803D !important; }
+.badge-ai    { background: #FEF3C7 !important; color: #D97706 !important; }
+.badge-verified { background: #E0F2FE !important; color: #0284C7 !important; }
+.badge-3     { background: #FEE2E2 !important; color: #DC2626 !important; }
 
-.nav-item.active .nav-badge {
-  background: #FFE2DA;
-  color: #FF5A36;
-}
-
-.nav-badge.badge-live {
-  background: #DCFCE7;
-  color: #15803D;
-}
-
-.nav-badge.badge-ai {
-  background: #EDE9FE;
-  color: #7C3AED;
-}
-
-/* Sidebar Footer & Farmer Profile Card */
-.sidebar-footer {
-  padding-top: 14px;
+/* ── Bottom Section ─────────────────────────────────────────── */
+.sidebar-bottom-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
   border-top: 1px solid #F0F2F5;
-  margin-top: 10px;
+  margin-top: auto;
 }
 
-.farmer-pill {
+/* Weather Card */
+.sidebar-weather-card {
+  background: #F8FAF8;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+.weather-card-top {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 10px;
-  border-radius: 14px;
-  background: #F8F9FA;
-  border: 1px solid #EAECEF;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
-
-.farmer-pill:hover {
-  background: #F0F2F5;
-  border-color: #D1D5DB;
-  transform: translateY(-1px);
-}
-
-.farmer-avatar-wrap {
-  position: relative;
-  width: 36px;
-  height: 36px;
+.weather-icon-badge {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: #DCFCE7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
+.weather-info-text { display: flex; flex-direction: column; }
+.weather-city-label { font-size: 0.7rem; font-weight: 700; color: #17251C; }
+.weather-temp-label { font-size: 0.65rem; color: #647067; font-weight: 500; }
+.weather-card-tip {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed #E5E7EB;
+  font-size: 0.62rem;
+  color: #047857;
+  font-weight: 600;
+}
 
+/* Profile Pill */
+.sidebar-farmer-pill {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.sidebar-farmer-pill:hover {
+  background: #F9FAF8;
+  border-color: #CBD5E1;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+.farmer-avatar-wrap { position: relative; width: 32px; height: 32px; flex-shrink: 0; }
 .farmer-avatar-img {
   width: 100%;
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
-  border: 1.5px solid #FFFFFF;
+  border: 1.5px solid #10B981;
 }
-
 .online-dot {
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: #10B981;
   border: 1.5px solid #FFFFFF;
 }
-
-.farmer-info {
-  flex: 1;
-  min-width: 0;
-}
-
+.farmer-info { flex: 1; min-width: 0; }
 .farmer-name {
-  font-size: 0.82rem;
+  font-size: 0.77rem;
   font-weight: 700;
-  color: #111827;
+  color: #17251C;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 .farmer-role {
-  font-size: 0.68rem;
-  color: #6B7280;
+  font-size: 0.63rem;
+  color: #647067;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.farmer-settings-icon { color: #9CA3AF; flex-shrink: 0; }
 
-.farmer-settings-icon {
-  color: #9CA3AF;
-  flex-shrink: 0;
+/* Logout Button */
+.sidebar-logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px;
+  background: transparent;
+  border: 1px solid #FEE2E2;
+  border-radius: 10px;
+  color: #DC2626;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+.sidebar-logout-btn:hover {
+  background: #FEF2F2;
+  border-color: #FCA5A5;
+}
+
+/* ── Mobile ─────────────────────────────────────────────────── */
+.sidebar-mobile-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(2px);
+  z-index: 998;
+}
+
+@media (max-width: 1024px) {
+  .kisan-sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    z-index: 999;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+  }
+  .kisan-sidebar.mobile-open { transform: translateX(0); }
+  .sidebar-mobile-backdrop { display: block; }
+  .sidebar-mobile-close { display: block; }
 }

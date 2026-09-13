@@ -5,9 +5,12 @@ import confetti from 'canvas-confetti';
 import { offersAPI } from '../../services/api';
 import '../../styles/Modals.css';
 
-const BuyerOfferModal = ({ buyer, onClose }) => {
+import { translations } from '../../data/translations';
+
+const BuyerOfferModal = ({ buyer, onClose, language }) => {
+  const t = translations[language] || translations.en;
   const [dealAccepted, setDealAccepted] = useState(false);
-  const [dealQuantity, setDealQuantity] = useState('300');
+  const [dealQuantity, setDealQuantity] = useState('');
 
   if (!buyer) return null;
 
@@ -36,7 +39,7 @@ const BuyerOfferModal = ({ buyer, onClose }) => {
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h3>
-            <span>{buyer.produceEmoji}</span> {buyer.name} - Direct Offer
+            <span>{buyer.produceEmoji}</span> {buyer.name} - {t.directOffer}
           </h3>
           <button className="modal-close-btn" onClick={onClose}><X size={18} /></button>
         </div>
@@ -47,12 +50,10 @@ const BuyerOfferModal = ({ buyer, onClose }) => {
               <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: '#dcfce7', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px auto' }}>
                 <CheckCircle2 size={36} />
               </div>
-              <h3 style={{ fontSize: '1.25rem', color: '#14281d', marginBottom: '6px' }}>Deal Successfully Reserved!</h3>
-              <p style={{ fontSize: '0.88rem', color: '#4b5563', lineHeight: '1.4', marginBottom: '16px' }}>
-                <strong>{buyer.name}</strong> logistics manager has been notified. Pickup scheduled for your farm in Rajkot.
-              </p>
+              <h3 style={{ fontSize: '1.25rem', color: '#14281d', marginBottom: '6px' }}>{t.dealReservedSuccess}</h3>
+              <p style={{ fontSize: '0.88rem', color: '#4b5563', lineHeight: '1.4', marginBottom: '16px' }} dangerouslySetInnerHTML={{ __html: t.pickupScheduledNotice ? t.pickupScheduledNotice.replace("{buyerName}", `<strong>${buyer.name}</strong>`) : `<strong>${buyer.name}</strong> logistics manager has been notified. Pickup scheduled for your farm in Rajkot.` }}></p>
               <div style={{ background: '#f8faf8', padding: '12px', borderRadius: '8px', border: '1px solid #e5ede7', display: 'inline-block', fontSize: '0.86rem', color: '#15803d', fontWeight: '700' }}>
-                Estimated Direct Settlement: ₹{calculatedTotal.toLocaleString()}
+                {t.estDirectSettlement} ₹{calculatedTotal.toLocaleString()}
               </div>
             </div>
           ) : (
@@ -60,11 +61,11 @@ const BuyerOfferModal = ({ buyer, onClose }) => {
               {/* Buyer Header Meta */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8faf8', padding: '12px 16px', borderRadius: '10px' }}>
                 <div>
-                  <div style={{ fontSize: '0.8rem', color: '#64748b' }}>Buying Specialty</div>
+                  <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{t.buyingSpecialtyLbl}</div>
                   <div style={{ fontWeight: '700', fontSize: '1rem', color: '#14281d' }}>{buyer.cropSpecialty}</div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '0.8rem', color: '#64748b' }}>Locked Rate</div>
+                  <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{t.lockedRateLbl}</div>
                   <div style={{ fontWeight: '800', fontSize: '1.35rem', color: '#15803d' }}>{buyer.offeredPrice}</div>
                 </div>
               </div>
@@ -76,20 +77,21 @@ const BuyerOfferModal = ({ buyer, onClose }) => {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', fontSize: '0.8rem' }}>
                 <div style={{ background: '#f0fdf4', padding: '10px', borderRadius: '8px', border: '1px solid #dcfce7' }}>
-                  <div style={{ color: '#166534', fontWeight: '700' }}>Payment Terms</div>
+                  <div style={{ color: '#166534', fontWeight: '700' }}>{t.paymentTermsLbl}</div>
                   <div style={{ color: '#14532d' }}>{buyer.paymentTerms}</div>
                 </div>
                 <div style={{ background: '#f0fdf4', padding: '10px', borderRadius: '8px', border: '1px solid #dcfce7' }}>
-                  <div style={{ color: '#166534', fontWeight: '700' }}>Farmgate Pickup</div>
-                  <div style={{ color: '#14532d' }}>{buyer.pickupAvailable ? 'Free Tractor Pickup' : 'Self Mandi Delivery'}</div>
+                  <div style={{ color: '#166534', fontWeight: '700' }}>{t.farmgatePickupLbl}</div>
+                  <div style={{ color: '#14532d' }}>{buyer.pickupAvailable ? t.freeTractorPickup : t.selfMandiDelivery}</div>
                 </div>
               </div>
 
               {/* Quantity Selection */}
               <div className="form-group">
-                <label>Enter Quantity to Commit (kg)</label>
+                <label>{t.enterQtyCommitLbl}</label>
                 <input 
                   type="number" 
+                  placeholder={t.enterQtyPH || "Enter quantity"}
                   value={dealQuantity} 
                   onChange={(e) => setDealQuantity(e.target.value)} 
                   className="form-control" 
@@ -97,7 +99,7 @@ const BuyerOfferModal = ({ buyer, onClose }) => {
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: '#fefce8', borderRadius: '8px', border: '1px solid #fde047' }}>
-                <span style={{ fontSize: '0.84rem', color: '#854d0e', fontWeight: '600' }}>Total Expected Payout:</span>
+                <span style={{ fontSize: '0.84rem', color: '#854d0e', fontWeight: '600' }}>{t.totalExpectedPayoutLbl}</span>
                 <strong style={{ fontSize: '1.2rem', color: '#713f12' }}>₹{calculatedTotal.toLocaleString()}</strong>
               </div>
             </>
@@ -106,12 +108,12 @@ const BuyerOfferModal = ({ buyer, onClose }) => {
 
         <div className="modal-footer">
           {dealAccepted ? (
-            <button className="btn-primary" onClick={onClose}>Done</button>
+            <button className="btn-primary" onClick={onClose}>{t.doneBtn || "Done"}</button>
           ) : (
             <>
-              <button className="btn-secondary" onClick={onClose}>Close</button>
+              <button className="btn-secondary" onClick={onClose}>{t.cancelBtn || "Close"}</button>
               <button className="btn-primary" onClick={handleAcceptDeal}>
-                Accept & Reserve Deal
+                {t.acceptReserveDealBtn}
               </button>
             </>
           )}

@@ -556,12 +556,110 @@
 }
 
 .screen-pill-btn.active {
-  background: #111827;
+  background: #10B981;
   color: #FFFFFF;
-  border-color: #111827;
+  border-color: #10B981;
 }
 
 .pill-num {
   font-size: 0.7rem;
-  opacity: 0.7;
+  opacity: 0.85;
 }
+
+/* Hamburger button for mobile */
+.mobile-hamburger-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: #17251C;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 8px;
+  margin-right: 8px;
+}
+
+.mobile-hamburger-btn:hover {
+  background: #F3F4F6;
+}
+
+/* Backend Connection Status Badge */
+.backend-status-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border: 1px solid #E5E7EB;
+  background: #FFFFFF;
+}
+
+.backend-status-pill.online {
+  background: #ECFDF5;
+  border-color: #A7F3D0;
+  color: #047857;
+}
+
+.backend-status-pill.fallback {
+  background: #FFFBEB;
+  border-color: #FDE68A;
+  color: #B45309;
+}
+
+.status-indicator-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulseDot 2s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+/* Farmer Avatar & Name */
+.header-avatar-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px 4px 4px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.header-avatar-btn:hover {
+  background: #F3F4F6;
+  border-color: #E5E7EB;
+}
+
+.header-farmer-name-tag {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #17251C;
+}
+
+@media (max-width: 1024px) {
+  .mobile-hamburger-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .header-greeting-title {
+    font-size: 1.15rem;
+  }
+
+  .header-greeting-sub {
+    display: none;
+  }
+
+  .header-farmer-name-tag {
+    display: none;
+  }
+}
+

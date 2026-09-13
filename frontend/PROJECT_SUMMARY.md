@@ -1,18 +1,18 @@
-# KisanLink React App - Project Summary
+# KisanSetu React App - Project Summary
 
 ## 🎉 Project Setup Complete!
 
-Your React app based on the KisanLink design is now ready and running.
+Your React app based on the KisanSetu design is now ready and running.
 
 ### Development Server
-- **URL**: http://localhost:5174/
+- **URL**: http://localhost:5173/
 - **Status**: Running ✅
 - **Command**: `npm run dev`
 
 ### Project Structure
 
 ```
-kisanlink-app/
+kisansetu-app/
 ├── src/
 │   ├── components/
 │   │   ├── Sidebar.jsx          # Left navigation sidebar

@@ -1,4 +1,4 @@
-/* src/styles/BuyerMarketplace.css */
+/* src/styles/BuyerMarketplace.css - Modern AgriTech Buyer Marketplace Styles */
 
 .buyer-marketplace-container {
   padding: 24px 32px 40px 32px;
@@ -9,107 +9,194 @@
   margin: 0 auto;
 }
 
-.marketplace-header h1 {
-  font-size: 1.55rem;
-  font-weight: 700;
-  color: #14281d;
-  margin-bottom: 4px;
-}
-
-.marketplace-header p {
-  font-size: 0.9rem;
-  color: #526056;
-}
-
-/* Category Filter Bar */
-.marketplace-filter-bar {
+.marketplace-header {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
 }
 
-.category-tabs-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+.marketplace-header h1 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #17251C;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
 }
 
-.cat-tab-btn {
-  padding: 8px 18px;
-  border-radius: 99px;
-  font-size: 0.84rem;
-  font-weight: 600;
-  color: #4b5563;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+.marketplace-header p {
+  font-size: 0.9rem;
+  color: #647067;
+}
+
+.btn-list-produce-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #10B981 0%, #047857 100%);
+  border: none;
+  color: #FFFFFF;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.28);
   transition: all 0.2s ease;
 }
 
-.cat-tab-btn:hover {
-  background: #f0fdf4;
-  color: #15803d;
-  border-color: #86efac;
+.btn-list-produce-top:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.38);
 }
 
-.cat-tab-btn.active {
-  background: #15803d;
-  color: #ffffff;
-  border-color: #15803d;
-  box-shadow: 0 2px 6px rgba(21, 128, 61, 0.2);
+/* Filters Panel */
+.marketplace-filters-panel {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 16px;
+  padding: 16px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
 
-.buyer-search-input-wrap {
+.filters-grid-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.filter-field-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filter-field-item.search-grow {
+  flex: 1.4;
+  min-width: 220px;
+}
+
+.filter-field-item label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #647067;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.search-input-pill {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #ffffff;
-  border: 1px solid #d1d5db;
-  border-radius: 99px;
-  padding: 8px 16px;
-  min-width: 260px;
+  background: #F9FAF8;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 8px 12px;
 }
 
-.buyer-search-input-wrap input {
+.search-input-pill input {
   border: none;
   outline: none;
   background: transparent;
-  font-size: 0.85rem;
+  font-size: 0.86rem;
   width: 100%;
+  font-family: inherit;
+  color: #17251C;
 }
 
-/* 2x2 Buyer Grid */
+.filter-select {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #F9FAF8;
+  border: 1px solid #E5E7EB;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #17251C;
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.filter-field-item.checkbox-align {
+  justify-content: center;
+  padding-bottom: 6px;
+}
+
+.checkbox-toggle-lbl {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-toggle-lbl input {
+  display: none;
+}
+
+.checkbox-custom-box {
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  border: 1.5px solid #CBD5E1;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  transition: all 0.15s ease;
+}
+
+.checkbox-toggle-lbl input:checked + .checkbox-custom-box {
+  background: #10B981;
+  border-color: #10B981;
+}
+
+.toggle-text {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.buyers-results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.84rem;
+  color: #647067;
+}
+
+/* 2-Column Buyers Grid */
 .buyers-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
 }
 
-@media (max-width: 850px) {
+@media (max-width: 900px) {
   .buyers-grid {
     grid-template-columns: 1fr;
   }
 }
 
 .buyer-card {
-  background: #ffffff;
-  border: 1px solid #e5ede7;
-  border-radius: var(--radius-lg);
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 18px;
   padding: 22px;
-  box-shadow: var(--shadow-card);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   gap: 16px;
+  transition: all 0.22s ease;
 }
 
 .buyer-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-card-hover);
-  border-color: #86efac;
+  transform: translateY(-2px);
+  border-color: #10B981;
+  box-shadow: 0 10px 24px rgba(16, 185, 129, 0.08);
 }
 
 .buyer-top-row {
@@ -126,185 +213,236 @@
 }
 
 .buyer-avatar-circle {
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   border-radius: 12px;
-  background: #f0fdf4;
+  background: #ECFDF5;
+  color: #047857;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.4rem;
-  border: 1px solid #dcfce7;
+  flex-shrink: 0;
 }
 
-.buyer-name {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #14281d;
-  margin-bottom: 2px;
-}
-
-.buyer-specialty {
-  font-size: 0.8rem;
-  color: #64748b;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.buyer-price-tag {
-  text-align: right;
-}
-
-.buyer-price-val {
-  font-size: 1.35rem;
-  font-weight: 800;
-  color: #15803d;
-}
-
-.buyer-price-label {
-  font-size: 0.72rem;
-  color: #64748b;
-}
-
-/* Rating and deals meta */
-.buyer-meta-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  font-size: 0.78rem;
-  color: #64748b;
-}
-
-.buyer-rating {
-  color: #d97706;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-/* Badges & CTA */
-.buyer-footer-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 12px;
-  border-top: 1px solid #f3f4f6;
-}
-
-.buyer-badges-wrap {
+.buyer-name-title-row {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.badge-demand-high {
-  background: #dcfce7;
-  color: #15803d;
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 99px;
+.buyer-company-name {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #17251C;
+  line-height: 1.2;
 }
 
-.badge-demand-med {
-  background: #fef3c7;
-  color: #b45309;
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 99px;
-}
-
-.badge-verified {
-  background: #e0f2fe;
-  color: #0369a1;
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 99px;
-  display: flex;
+.buyer-verified-badge {
+  display: inline-flex;
   align-items: center;
   gap: 3px;
-}
-
-.view-offer-btn {
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  color: #15803d;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #DCFCE7;
+  color: #047857;
+  font-size: 0.68rem;
   font-weight: 700;
-  font-size: 0.82rem;
-  padding: 7px 16px;
-  border-radius: 8px;
-  transition: all 0.2s ease;
 }
 
-.view-offer-btn:hover {
-  background: #15803d;
-  color: #ffffff;
-  border-color: #15803d;
+.buyer-location-text {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.76rem;
+  color: #647067;
+  margin-top: 3px;
+}
+
+.buyer-offered-price-box {
+  background: #F9FAF8;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 6px 12px;
+  text-align: right;
+}
+
+.buyer-price-val {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #10B981;
+  line-height: 1.1;
+}
+
+.buyer-price-label {
+  font-size: 0.64rem;
+  color: #647067;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.buyer-specs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  background: #F9FAF8;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 0.8rem;
+}
+
+.spec-row-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.spec-label {
+  font-size: 0.68rem;
+  color: #647067;
+}
+
+.spec-value {
+  color: #17251C;
+}
+
+.buyer-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 4px;
+}
+
+.buyer-rating-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: #17251C;
+}
+
+.deals-count {
+  font-size: 0.74rem;
+  color: #647067;
+}
+
+.demand-pill {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.demand-pill.high { background: #ECFDF5; color: #047857; }
+.demand-pill.med { background: #FEF3C7; color: #D97706; }
+
+.buyer-card-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 6px;
+}
+
+.btn-connect-buyer {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px;
+  border-radius: 10px;
+  background: #F3F4F6;
+  border: 1px solid #CBD5E1;
+  color: #17251C;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.btn-connect-buyer:hover {
+  background: #E5E7EB;
+}
+
+.btn-make-offer {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px;
+  border-radius: 10px;
+  background: #10B981;
+  border: none;
+  color: #FFFFFF;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+}
+
+.btn-make-offer:hover {
+  background: #047857;
 }
 
 /* Bottom Produce Listing Banner */
 .produce-listing-banner {
-  background: linear-gradient(135deg, #fefce8 0%, #f7fee7 50%, #f0fdf4 100%);
-  border: 1px solid #fde047;
-  border-radius: var(--radius-lg);
-  padding: 22px 28px;
+  background: linear-gradient(135deg, #FEF3C7 0%, #ECFDF5 100%);
+  border: 1px solid #BBF7D0;
+  border-radius: 18px;
+  padding: 24px 30px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: var(--shadow-sm);
-  position: relative;
-  overflow: hidden;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
 .produce-banner-left {
   display: flex;
   align-items: center;
   gap: 16px;
-  z-index: 2;
 }
 
 .produce-basket-icon {
   width: 48px;
   height: 48px;
   border-radius: 14px;
-  background: #ffffff;
-  border: 1px solid #fde68a;
+  background: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.6rem;
-  box-shadow: 0 4px 10px rgba(234, 179, 8, 0.15);
+  font-size: 1.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 .produce-banner-title {
   font-size: 1.15rem;
   font-weight: 800;
-  color: #14281d;
-  margin-bottom: 2px;
+  color: #17251C;
 }
 
 .produce-banner-sub {
-  font-size: 0.82rem;
-  color: #526056;
+  font-size: 0.84rem;
+  color: #4B5563;
 }
 
 .become-seller-btn {
-  background: #15803d;
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 0.86rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 10px 22px;
-  border-radius: 99px;
-  z-index: 2;
-  box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
+  border-radius: 999px;
+  background: #047857;
+  color: #FFFFFF;
+  font-size: 0.88rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .become-seller-btn:hover {
-  background: #166534;
-  transform: scale(1.02);
+  background: #15803D;
+  transform: translateY(-1px);
 }

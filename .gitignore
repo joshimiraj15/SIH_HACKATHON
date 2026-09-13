@@ -61,3 +61,7 @@ Thumbs.db
 # Archives
 *.zip
 
+# Temporary scripts & scratch
+scratch/
+patch_*.cjs
+*/patch_*.cjs
